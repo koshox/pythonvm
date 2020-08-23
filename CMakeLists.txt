@@ -20,7 +20,7 @@ ADD_EXECUTABLE(pythonvm main.cpp
         runtime/universe.cpp
         runtime/frameObject.cpp
         runtime/functionObject.cpp
-        #runtime/stringTable.cpp
+        runtime/stringTable.cpp
         #runtime/module.cpp
         #runtime/traceback.cpp
         #runtime/generator.cpp

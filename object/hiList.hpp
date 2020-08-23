@@ -18,6 +18,9 @@ private:
 public:
     static ListKlass *get_instance();
 
+    virtual HiObject *add(HiObject *x, HiObject *y);
+    virtual HiObject *mul(HiObject *x, HiObject *y);
+
     virtual void print(HiObject *obj);
     virtual HiObject *subscr(HiObject *x, HiObject *y);
     virtual void store_subscr(HiObject *x, HiObject *y, HiObject *z);
@@ -25,6 +28,7 @@ public:
     virtual HiObject *contains(HiObject *x, HiObject *y);
     virtual HiObject *less(HiObject *x, HiObject *y);
     virtual HiObject *len(HiObject *x);
+    virtual HiObject *iter(HiObject* x);
 };
 
 class HiList : public HiObject {
@@ -54,5 +58,29 @@ HiObject *list_pop(ObjList args);
 HiObject *list_remove(ObjList args);
 HiObject *list_reverse(ObjList args);
 HiObject *list_sort(ObjList args);
+
+class ListIteratorKlass : public Klass {
+private:
+    static ListIteratorKlass *instance;
+    ListIteratorKlass();
+
+public:
+    static ListIteratorKlass *get_instance();
+};
+
+class ListIterator : public HiObject {
+private:
+    HiList* _owner;
+    int _iter_cnt;
+
+public:
+    ListIterator(HiList *owner);
+
+    HiList* owner()        { return _owner; }
+    int iter_cnt()         { return _iter_cnt; }
+    void inc_cnt()         { _iter_cnt++; }
+};
+
+HiObject *listiterator_next(ObjList args);
 
 #endif //PYTHONVM_HILIST_HPP

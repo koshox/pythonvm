@@ -17,7 +17,7 @@ FrameObject::FrameObject(CodeObject *codes) {
     _globals = _locals;
     _fast_locals = NULL;
 
-    _stack = new ArrayList<HiObject *>();
+    _stack = new HiList();
     _loop_stack = new ArrayList<Block *>();
 
     _pc = 0;
@@ -31,7 +31,7 @@ FrameObject::FrameObject(FunctionObject *func, ObjList args) {
 
     _locals = new Map<HiObject *, HiObject *>();
     _globals = func->_globals;
-    _fast_locals = new ArrayList<HiObject *>();
+    _fast_locals = new HiList();
 
     if (func->_defaults) {
         int dft_num = func->_defaults->length();
@@ -47,7 +47,7 @@ FrameObject::FrameObject(FunctionObject *func, ObjList args) {
         }
     }
 
-    _stack = new ArrayList<HiObject *>();
+    _stack = new HiList();
     _loop_stack = new ArrayList<Block *>();
 
     _pc = 0;

@@ -91,6 +91,14 @@ void HiObject::del_subscr(HiObject *x) {
     return klass()->del_subscr(this, x);
 }
 
+HiObject* HiObject::iter() {
+    return klass()->iter(this);
+}
+
+HiObject* HiObject::next() {
+    return klass()->next(this);
+}
+
 HiObject* HiObject::len() {
     return klass()->len(this);
 }

@@ -9,9 +9,11 @@
 #include "../code/bytecode.hpp"
 #include "universe.hpp"
 #include "functionObject.hpp"
+#include "stringTable.hpp"
 
-#define PUSH(x)       _frame->stack()->add((x))
+#define PUSH(x)       _frame->stack()->append((x))
 #define POP()         _frame->stack()->pop()
+#define TOP()         _frame->stack()->top()
 #define STACK_LEVEL() _frame->stack()->size()
 
 #define HI_TRUE       Universe::HiTrue
@@ -53,8 +55,6 @@ void Interpreter::eval_frame() {
     HiObject *lhs, *rhs;
     HiObject *v, *w, *u, *attr;
 
-    HiList * tempList;
-
     unsigned char op_code;
     bool has_arg;
     int op_arg;
@@ -71,6 +71,12 @@ void Interpreter::eval_frame() {
         switch (op_code) {
             case ByteCode::POP_TOP:
                 POP();
+                break;
+
+            case ByteCode::BINARY_MULTIPLY:
+                v = POP();
+                w = POP();
+                PUSH(w->mul(v));
                 break;
 
             case ByteCode::BINARY_ADD:
@@ -96,6 +102,22 @@ void Interpreter::eval_frame() {
                 v = POP();
                 w = POP();
                 w->del_subscr(v);
+                break;
+
+            case ByteCode::GET_ITER:
+                v = POP();
+                PUSH(v->iter());
+                break;
+
+            case ByteCode::FOR_ITER:
+                v = TOP();
+                w = v->get_attr(StringTable::get_instance()->next_str);
+                build_frame(w, NULL);
+
+                if (TOP() == NULL) {
+                    _frame->_pc += op_arg;
+                    POP();
+                }
                 break;
 
             case ByteCode::PRINT_ITEM:
@@ -156,18 +178,12 @@ void Interpreter::eval_frame() {
                 break;
 
             case ByteCode::BUILD_LIST:
-/*                v = new HiList();
+                v = new HiList();
                 while (op_arg--) {
                     ((HiList *) v)->set(op_arg, POP());
                 }
 
-                PUSH(v);*/
-                tempList = new HiList();
-                while (op_arg--) {
-                    tempList->set(op_arg, POP());
-                }
-
-                PUSH(tempList);
+                PUSH(v);
                 break;
 
             case ByteCode::LOAD_ATTR:

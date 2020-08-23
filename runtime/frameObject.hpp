@@ -5,6 +5,7 @@
 #ifndef PYTHONVM_FRAMEOBJECT_HPP
 #define PYTHONVM_FRAMEOBJECT_HPP
 
+#include "object/hiList.hpp"
 #include "code/codeObject.hpp"
 #include "util/map.hpp"
 #include "util/arrayList.hpp"
@@ -43,15 +44,15 @@ public:
 
     FrameObject(FunctionObject *func, ObjList args);
 
-    ArrayList<HiObject *> *_stack;
-    ArrayList<Block *> *_loop_stack;
+    HiList *_stack;
+    ArrayList<Block*>* _loop_stack;
 
     ArrayList<HiObject *> *_consts;
     ArrayList<HiObject *> *_names;
 
     Map<HiObject *, HiObject *> *_locals;
     Map<HiObject *, HiObject *> *_globals;
-    ArrayList<HiObject *> *_fast_locals;
+    HiList *_fast_locals;
 
     FrameObject *_sender;
     CodeObject *_codes;
@@ -66,7 +67,7 @@ public:
 
     int get_pc() { return _pc; }
 
-    ArrayList<HiObject *> *stack() { return _stack; }
+    HiList *stack() { return _stack; }
 
     ArrayList<Block *> *loop_stack() { return _loop_stack; }
 
@@ -78,8 +79,7 @@ public:
 
     Map<HiObject *, HiObject *> *globals() { return _globals; }
 
-    ArrayList<HiObject *> *fast_locals() { return _fast_locals; }
-
+    HiList *fast_locals() { return _fast_locals; }
 
     bool has_more_codes();
 

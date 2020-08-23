@@ -42,7 +42,9 @@ public:
     void store_subscr(HiObject *x, HiObject *y);
     void del_subscr(HiObject *x);
 
-    HiObject* len();
+    HiObject *iter();
+    HiObject *next();
+    HiObject *len();
 };
 
 #endif //PYTHONVM_HIOBJECT_HPP
