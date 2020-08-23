@@ -2,6 +2,7 @@
 // Created by Kosho on 2020/8/15.
 //
 
+#include "object/hiDict.hpp"
 #include "object/hiList.hpp"
 #include "util/map.hpp"
 #include "object/hiInteger.hpp"
@@ -184,6 +185,18 @@ void Interpreter::eval_frame() {
                 }
 
                 PUSH(v);
+                break;
+
+            case ByteCode::BUILD_MAP:
+                v = new HiDict();
+                PUSH(v);
+                break;
+
+            case ByteCode::STORE_MAP:
+                w = POP();
+                u = POP();
+                v = TOP();
+                ((HiDict*)v)->put(w , u);
                 break;
 
             case ByteCode::LOAD_ATTR:

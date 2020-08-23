@@ -11,7 +11,7 @@ ADD_EXECUTABLE(pythonvm main.cpp
         object/hiString.cpp
         object/hiObject.cpp
         object/hiList.cpp
-        #object/hiDict.cpp
+        object/hiDict.cpp
         object/klass.cpp
         util/arrayList.cpp
         util/map.cpp
