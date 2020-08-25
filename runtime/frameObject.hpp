@@ -50,8 +50,8 @@ public:
     ArrayList<HiObject *> *_consts;
     ArrayList<HiObject *> *_names;
 
-    Map<HiObject *, HiObject *> *_locals;
-    Map<HiObject *, HiObject *> *_globals;
+    HiDict *_locals;
+    HiDict *_globals;
     HiList *_fast_locals;
 
     FrameObject *_sender;
@@ -75,9 +75,9 @@ public:
 
     ArrayList<HiObject *> *names() { return _names; }
 
-    Map<HiObject *, HiObject *> *locals() { return _locals; }
+    HiDict *locals() { return _locals; }
 
-    Map<HiObject *, HiObject *> *globals() { return _globals; }
+    HiDict *globals() { return _globals; }
 
     HiList *fast_locals() { return _fast_locals; }
 

@@ -11,7 +11,7 @@
 
 class Interpreter {
 private:
-    Map<HiObject*,HiObject*> *_builtins;
+    HiDict *_builtins;
     FrameObject *_frame;
     HiObject *_ret_value;
 

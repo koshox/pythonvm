@@ -33,7 +33,7 @@ Interpreter *Interpreter::get_instance() {
 Interpreter::Interpreter() {
     _frame = NULL;
 
-    _builtins = new Map<HiObject *, HiObject *>();
+    _builtins = new HiDict();
     _builtins->put(new HiString("True"), Universe::HiTrue);
     _builtins->put(new HiString("False"), Universe::HiFalse);
     _builtins->put(new HiString("None"), Universe::HiNone);

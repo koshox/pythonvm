@@ -4,6 +4,9 @@
 
 #include <runtime/universe.hpp>
 #include "hiObject.hpp"
+#include "object/hiDict.hpp"
+#include "object/hiString.hpp"
+#include "runtime/universe.hpp"
 #include "runtime/functionObject.hpp"
 
 void HiObject::print() {

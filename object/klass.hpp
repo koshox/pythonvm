@@ -12,11 +12,13 @@
 
 class HiObject;
 class HiString;
+class HiDict;
+class HiList;
 
 class Klass {
 private:
     HiString * _name;
-    Map<HiObject*, HiObject*>* _klass_dict;
+    HiDict* _klass_dict;
 
 public:
     Klass();
@@ -26,8 +28,8 @@ public:
     void set_name(HiString * x) { _name = x; }
     HiString *name() const { return _name; }
 
-    void set_klass_dict(Map<HiObject *, HiObject *> *dict) { _klass_dict = dict; }
-    Map<HiObject *, HiObject *> *klass_dict() { return _klass_dict; }
+    void set_klass_dict(HiDict *dict) { _klass_dict = dict; }
+    HiDict *klass_dict() { return _klass_dict; }
 
     virtual void print(HiObject *obj) {};
 

@@ -4,6 +4,7 @@
 
 #include "object/hiInteger.hpp"
 #include "object/hiString.hpp"
+#include "object/hiDict.hpp"
 #include "runtime/universe.hpp"
 #include "runtime/functionObject.hpp"
 
@@ -81,7 +82,7 @@ NativeFunctionKlass::NativeFunctionKlass() {
 }
 
 MethodKlass::MethodKlass() {
-    set_klass_dict(new Map<HiObject *, HiObject *>());
+    set_klass_dict(new HiDict());
 }
 
 MethodKlass* MethodKlass::instance = NULL;
