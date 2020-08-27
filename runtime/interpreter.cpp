@@ -150,6 +150,13 @@ void Interpreter::eval_frame() {
                 _frame->locals()->put(v, POP());
                 break;
 
+            case ByteCode::UNPACK_SEQUENCE:
+                v = POP();
+                while (op_arg--) {
+                    PUSH(v->subscr(new HiInteger(op_arg)));
+                }
+                break;
+
             case ByteCode::LOAD_CONST:
                 v = _frame->consts()->get(op_arg);
                 PUSH(v);

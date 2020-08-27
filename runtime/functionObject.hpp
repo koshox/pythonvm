@@ -25,6 +25,7 @@ typedef HiObject *(*NativeFuncPointer)(ObjList args);
 
 class FunctionObject : public HiObject {
     friend class FunctionKlass;
+    friend class NativeFunctionKlass;
     friend class FrameObject;
 
 private:

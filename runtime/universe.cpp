@@ -22,6 +22,8 @@ void Universe::genesis() {
     klass_dict->put(new HiString("upper"), new FunctionObject(string_upper));
 
     StringKlass::get_instance()->set_name(new HiString("string"));
+
+    DictKlass::get_instance()->initialize();
 }
 
 void Universe::destory() {}
