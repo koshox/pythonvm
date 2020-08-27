@@ -24,7 +24,7 @@ public:
 
     void run(CodeObject *codes);
 
-    void build_frame(HiObject *pObject, ObjList args);
+    void build_frame(HiObject *pObject, ObjList args, int op_arg);
 
     void eval_frame();
 

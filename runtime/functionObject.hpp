@@ -39,6 +39,12 @@ private:
     unsigned int _flags;
 
 public:
+    enum CO_FLAGS {
+        CO_VARARGS = 0x4,
+        CO_VARKEYWORDS = 0x8,
+        CO_GENERATOR = 0x20,
+    };
+
     FunctionObject(HiObject *code_object);
 
     FunctionObject(NativeFuncPointer nfp);

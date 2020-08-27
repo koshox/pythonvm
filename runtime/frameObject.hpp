@@ -42,7 +42,7 @@ class FrameObject {
 public:
     FrameObject(CodeObject *codes);
 
-    FrameObject(FunctionObject *func, ObjList args);
+    FrameObject(FunctionObject *func, ObjList args, int op_arg);
 
     HiList *_stack;
     ArrayList<Block*>* _loop_stack;

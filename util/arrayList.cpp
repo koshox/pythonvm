@@ -3,6 +3,8 @@
 //
 
 #include "arrayList.hpp"
+#include "object/hiObject.hpp"
+#include "runtime/universe.hpp"
 
 template<typename T>
 ArrayList<T>::ArrayList(int n) {
@@ -83,6 +85,22 @@ void ArrayList<T>::delete_index(int index) {
     }
 
     _size--;
+}
+
+template <typename T>
+int ArrayList<T>::index(T t) {
+    return 0;
+}
+
+template <>
+int ArrayList<HiObject*>::index(HiObject* t) {
+    for (int i = 0; i < _size; i++) {
+        if (_array[i]->equal(t) == Universe::HiTrue) {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 class HiObject;

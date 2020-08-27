@@ -31,6 +31,8 @@ public:
 
     int length();
 
+    int index(T t);
+
     T *value() { return _array; }
 
     T pop();

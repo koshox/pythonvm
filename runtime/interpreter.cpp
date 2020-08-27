@@ -80,7 +80,22 @@ void Interpreter::eval_frame() {
                 PUSH(w->mul(v));
                 break;
 
+            case ByteCode::BINARY_DIVIDE:
+            case ByteCode::INPLACE_DIVIDE:
+                v = POP();
+                w = POP();
+                PUSH(w->div(v));
+                break;
+
+            case ByteCode::BINARY_MODULO:
+            case ByteCode::INPLACE_MODULO:
+                v = POP();
+                w = POP();
+                PUSH(w->mod(v));
+                break;
+
             case ByteCode::BINARY_ADD:
+            case ByteCode::INPLACE_ADD:
                 v = POP();
                 w = POP();
                 PUSH(w->add(v));
@@ -113,7 +128,8 @@ void Interpreter::eval_frame() {
             case ByteCode::FOR_ITER:
                 v = TOP();
                 w = v->get_attr(StringTable::get_instance()->next_str);
-                build_frame(w, NULL);
+                // TODO
+                build_frame(w, NULL, 0);
 
                 if (TOP() == NULL) {
                     _frame->_pc += op_arg;
@@ -203,7 +219,7 @@ void Interpreter::eval_frame() {
                 w = POP();
                 u = POP();
                 v = TOP();
-                ((HiDict*)v)->put(w , u);
+                ((HiDict *) v)->put(w, u);
                 break;
 
             case ByteCode::LOAD_ATTR:
@@ -312,12 +328,15 @@ void Interpreter::eval_frame() {
 
             case ByteCode::CALL_FUNCTION:
                 if (op_arg > 0) {
-                    args = new ArrayList<HiObject *>(op_arg);
-                    while (op_arg--) {
-                        args->set(op_arg, POP());
+                    int arg_num = op_arg & 0xff;
+                    int key_arg_num = op_arg >> 8;
+                    int arg_cnt = arg_num + 2 * key_arg_num;
+                    args = new ArrayList<HiObject *>(arg_cnt);
+                    while (arg_cnt--) {
+                        args->set(arg_cnt, POP());
                     }
                 }
-                build_frame(POP(), args);
+                build_frame(POP(), args, op_arg);
 
                 if (args != NULL) {
                     delete args;
@@ -366,7 +385,7 @@ void Interpreter::destroy_frame() {
     delete temp;
 }
 
-void Interpreter::build_frame(HiObject *callable, ObjList args) {
+void Interpreter::build_frame(HiObject *callable, ObjList args, int op_arg) {
     if (callable->klass() == NativeFunctionKlass::get_instance()) {
         PUSH(((FunctionObject *) callable)->call(args));
     } else if (callable->klass() == MethodKlass::get_instance()) {
@@ -375,9 +394,9 @@ void Interpreter::build_frame(HiObject *callable, ObjList args) {
             args = new ArrayList<HiObject *>(1);
         }
         args->insert(0, method->owner());
-        build_frame(method->func(), args);
+        build_frame(method->func(), args, op_arg + 1);
     } else if (callable->klass() == FunctionKlass::get_instance()) {
-        FrameObject *frame = new FrameObject((FunctionObject *) callable, args);
+        FrameObject *frame = new FrameObject((FunctionObject *) callable, args, op_arg);
         frame->set_sender(_frame);
         _frame = frame;
     }
