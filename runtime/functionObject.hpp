@@ -32,6 +32,7 @@ private:
     CodeObject *_func_code;
     HiString *_func_name;
     HiDict *_globals;
+    HiList* _closure;
     ObjList _defaults;
 
     NativeFuncPointer _native_func;
@@ -64,6 +65,9 @@ public:
 
     HiDict *globals() { return _globals; }
     void set_globals(HiDict *x) { _globals = x; }
+
+    void set_closure(HiList *x) { _closure = x; }
+    HiList *closure() { return _closure; }
 
     void set_default(ObjList defaults);
     ObjList defaults() { return _defaults; }

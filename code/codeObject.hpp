@@ -22,7 +22,7 @@ public:
     ArrayList<HiObject *> *_var_names;
 
     ArrayList<HiObject *> *_free_vars;
-    ArrayList<HiObject *> *_cell_vars;
+    ArrayList<HiObject *> *_cell_vars; // 在本函数定义，被内部函数引用的变量
 
     HiString *_co_name;
     HiString *_file_name;

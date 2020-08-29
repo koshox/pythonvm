@@ -45,7 +45,7 @@ public:
     FrameObject(FunctionObject *func, ObjList args, int op_arg);
 
     HiList *_stack;
-    ArrayList<Block*>* _loop_stack;
+    ArrayList<Block *> *_loop_stack;
 
     ArrayList<HiObject *> *_consts;
     ArrayList<HiObject *> *_names;
@@ -53,6 +53,7 @@ public:
     HiDict *_locals;
     HiDict *_globals;
     HiList *_fast_locals;
+    HiList *_closure;
 
     FrameObject *_sender;
     CodeObject *_codes;
@@ -80,6 +81,10 @@ public:
     HiDict *globals() { return _globals; }
 
     HiList *fast_locals() { return _fast_locals; }
+
+    HiList *closure() { return _closure; }
+
+    HiObject *get_cell_from_parameter(int i);
 
     bool has_more_codes();
 

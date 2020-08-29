@@ -92,8 +92,7 @@ FrameObject::FrameObject(FunctionObject *func, ObjList args, int op_arg) {
             alist = new HiList();
         _fast_locals->set(argcnt, alist);
         kw_pos += 1;
-    }
-    else {
+    } else {
         // give more parameters than need.
         if (alist != NULL) {
             printf("takes more extend parameters.\n");
@@ -111,6 +110,24 @@ FrameObject::FrameObject(FunctionObject *func, ObjList args, int op_arg) {
         if (adict != NULL) {
             printf("takes more extend kw parameters.\n");
             assert(false);
+        }
+    }
+
+    _closure = NULL;
+    ArrayList<HiObject*>* cells = _codes->_cell_vars;
+    if (cells && cells->size() > 0) {
+        _closure = new HiList();
+
+        for (int i = 0; i < cells->size(); i++) {
+            _closure->append(NULL);
+        }
+    }
+
+    if (func->closure() && func->closure()->size() > 0) {
+        if (_closure == NULL)
+            _closure = func->closure();
+        else {
+            _closure = (HiList*)_closure->add(func->closure());
         }
     }
 
@@ -137,4 +154,10 @@ bool FrameObject::has_more_codes() {
 
 bool FrameObject::is_first_frame() {
     return _sender == NULL;
+}
+
+HiObject *FrameObject::get_cell_from_parameter(int i) {
+    HiObject *cell_name = _codes->_cell_vars->get(i);
+    i = _codes->_var_names->index(cell_name);
+    return _fast_locals->get(i);
 }

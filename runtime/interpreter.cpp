@@ -11,11 +11,13 @@
 #include "universe.hpp"
 #include "functionObject.hpp"
 #include "stringTable.hpp"
+#include "cellObject.hpp"
 
 #define PUSH(x)       _frame->stack()->append((x))
 #define POP()         _frame->stack()->pop()
 #define TOP()         _frame->stack()->top()
 #define STACK_LEVEL() _frame->stack()->size()
+#define PEEK(x)       _frame->stack()->get((x))
 
 #define HI_TRUE       Universe::HiTrue
 #define HI_FALSE      Universe::HiFalse
@@ -74,10 +76,30 @@ void Interpreter::eval_frame() {
                 POP();
                 break;
 
+            case ByteCode::ROT_TWO:
+                v = POP();
+                w = POP();
+                PUSH(v);
+                PUSH(w);
+                break;
+
+            case ByteCode::ROT_THREE:
+                v = POP();
+                w = POP();
+                u = POP();
+                PUSH(v);
+                PUSH(u);
+                PUSH(w);
+                break;
+
             case ByteCode::BINARY_MULTIPLY:
                 v = POP();
                 w = POP();
                 PUSH(w->mul(v));
+                break;
+
+            case ByteCode::DUP_TOP:
+                PUSH(TOP());
                 break;
 
             case ByteCode::BINARY_DIVIDE:
@@ -173,6 +195,13 @@ void Interpreter::eval_frame() {
                 }
                 break;
 
+            case ByteCode::DUP_TOPX:
+                for (int i = 0; i < op_arg; i++) {
+                    int index = STACK_LEVEL() - op_arg;
+                    PUSH(PEEK(index));
+                }
+                break;
+
             case ByteCode::LOAD_CONST:
                 v = _frame->consts()->get(op_arg);
                 PUSH(v);
@@ -201,6 +230,7 @@ void Interpreter::eval_frame() {
                 PUSH(Universe::HiNone);
                 break;
 
+            case ByteCode::BUILD_TUPLE:
             case ByteCode::BUILD_LIST:
                 v = new HiList();
                 while (op_arg--) {
@@ -339,7 +369,6 @@ void Interpreter::eval_frame() {
                 build_frame(POP(), args, op_arg);
 
                 if (args != NULL) {
-                    delete args;
                     args = NULL;
                 }
                 break;
@@ -357,11 +386,83 @@ void Interpreter::eval_frame() {
                 fo->set_default(args);
 
                 if (args != NULL) {
-                    delete args;
                     args = NULL;
                 }
 
                 PUSH(fo);
+                break;
+
+            case ByteCode::MAKE_CLOSURE:
+                v = POP();
+                fo = new FunctionObject(v);
+                fo->set_closure((HiList *) POP());
+                fo->set_globals(_frame->globals());
+                if (op_arg > 0) {
+                    args = new ArrayList<HiObject *>(op_arg);
+                    while (op_arg--) {
+                        args->set(op_arg, POP());
+                    }
+                }
+                fo->set_default(args);
+
+                if (args != NULL) {
+                    args = NULL;
+                }
+
+                PUSH(fo);
+                break;
+
+            case ByteCode::LOAD_CLOSURE:
+                v = _frame->closure()->get(op_arg);
+                // 为空说明不是局部变量而是参数
+                if (v == NULL) {
+                    v = _frame->get_cell_from_parameter(op_arg);
+                    _frame->closure()->set(op_arg, v);
+                }
+
+                if (v->klass() == CellKlass::get_instance()) {
+                    PUSH(v);
+                } else {
+                    PUSH(new CellObject(_frame->closure(), op_arg));
+                }
+                break;
+
+            case ByteCode::LOAD_DEREF:
+                v = _frame->closure()->get(op_arg);
+                if (v->klass() == CellKlass::get_instance()) {
+                    v = ((CellObject *) v)->value();
+                }
+                PUSH(v);
+                break;
+
+            case ByteCode::STORE_DEREF:
+                _frame->closure()->set(op_arg, POP());
+                break;
+
+            case ByteCode::CALL_FUNCTION_VAR:
+                v = POP();
+                if (op_arg > 0 || (v && ((HiList *) v)->size() > 0)) {
+                    int arg_num = op_arg & 0xff;
+                    int key_arg_num = op_arg >> 8;
+                    int arg_cnt = arg_num + 2 * key_arg_num;
+                    args = new ArrayList<HiObject *>();
+                    while (arg_cnt--) {
+                        args->set(arg_cnt, POP());
+                    }
+
+                    int s = ((HiList *) v)->size();
+                    for (int i = 0; i < s; i++) {
+                        args->add(((HiList *) v)->get(i));
+                    }
+                    arg_num += s;
+                    op_arg = (key_arg_num << 8) | arg_num;
+                }
+
+                build_frame(POP(), args, op_arg);
+
+                if (args != NULL) {
+                    args = NULL;
+                }
                 break;
 
             case ByteCode::RETURN_VALUE:
