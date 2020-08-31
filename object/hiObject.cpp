@@ -2,12 +2,25 @@
 // Created by Kosho on 2020/8/15.
 //
 
-#include <runtime/universe.hpp>
+#include "runtime/universe.hpp"
+#include "runtime/stringTable.hpp"
 #include "hiObject.hpp"
 #include "object/hiDict.hpp"
 #include "object/hiString.hpp"
 #include "runtime/universe.hpp"
 #include "runtime/functionObject.hpp"
+
+ObjectKlass *ObjectKlass::instance = NULL;
+
+ObjectKlass::ObjectKlass() {
+}
+
+ObjectKlass *ObjectKlass::get_instance() {
+    if (instance == NULL)
+        instance = new ObjectKlass();
+
+    return instance;
+}
 
 void HiObject::print() {
     klass()->print(this);
@@ -66,7 +79,7 @@ HiObject *HiObject::get_attr(HiObject *x) {
     }
 
     if (MethodObject::is_function(result)) {
-        result = new MethodObject((FunctionObject*)result, this);
+        result = new MethodObject((FunctionObject *) result, this);
     }
 
     return result;
@@ -94,14 +107,50 @@ void HiObject::del_subscr(HiObject *x) {
     return klass()->del_subscr(this, x);
 }
 
-HiObject* HiObject::iter() {
+HiObject *HiObject::iter() {
     return klass()->iter(this);
 }
 
-HiObject* HiObject::next() {
+HiObject *HiObject::next() {
     return klass()->next(this);
 }
 
-HiObject* HiObject::len() {
+HiObject *HiObject::len() {
     return klass()->len(this);
+}
+
+TypeKlass *TypeKlass::instance = NULL;
+
+TypeKlass *TypeKlass::get_instance() {
+    if (instance == NULL)
+        instance = new TypeKlass();
+
+    return instance;
+}
+
+void TypeKlass::print(HiObject *obj) {
+    assert(obj->klass() == (Klass *) this);
+    printf("<type '");
+    Klass *own_klass = ((HiTypeObject *) obj)->own_klass();
+
+    HiDict *attr_dict = own_klass->klass_dict();
+    if (attr_dict) {
+        HiObject *mod = attr_dict->get((HiObject *) StringTable::get_instance()->mod_str);
+        if (mod != Universe::HiNone) {
+            mod->print();
+            printf(".");
+        }
+    }
+
+    own_klass->name()->print();
+    printf("'>");
+}
+
+HiTypeObject::HiTypeObject() {
+    set_klass(TypeKlass::get_instance());
+}
+
+void HiTypeObject::set_own_klass(Klass *k) {
+    _own_klass = k;
+    k->set_type_object(this);
 }

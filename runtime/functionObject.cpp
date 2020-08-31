@@ -112,6 +112,29 @@ HiObject *len(ObjList args) {
     return args->get(0)->len();
 }
 
+HiObject *isinstance(ObjList args) {
+    HiObject *x = args->get(0);
+    HiObject *y = args->get(1);
+
+    assert(y && y->klass() == TypeKlass::get_instance());
+
+    Klass *k = x->klass();
+    while (k != NULL) {
+        if (k == ((HiTypeObject *) y)->own_klass()) {
+            return Universe::HiTrue;
+        }
+
+        k = k->super();
+    }
+
+    return Universe::HiFalse;
+}
+
+HiObject *type_of(ObjList args) {
+    HiObject *arg0 = args->get(0);
+    return arg0->klass()->type_object();
+}
+
 HiObject *string_upper(ObjList args) {
     HiObject *arg0 = args->get(0);
     assert(arg0->klass() == StringKlass::get_instance());

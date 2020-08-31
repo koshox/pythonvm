@@ -118,5 +118,7 @@ public:
 };
 
 HiObject* len(ObjList args);
+HiObject* isinstance(ObjList args);
+HiObject* type_of(ObjList args);
 
 #endif //PYTHONVM_FUNCTIONOBJECT_HPP

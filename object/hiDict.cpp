@@ -45,6 +45,8 @@ void DictKlass::initialize() {
                     new FunctionObject(dict_iteritems));
     set_klass_dict(klass_dict);
     set_name(new HiString("dict"));
+    (new HiTypeObject())->set_own_klass(this);
+    set_super(ObjectKlass::get_instance());
 }
 
 /*

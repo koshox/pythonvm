@@ -2,8 +2,7 @@
 // Created by Kosho on 2020/8/15.
 //
 
-#include "object/hiDict.hpp"
-#include "object/hiList.hpp"
+#include "runtime/frameObject.hpp"
 #include "util/map.hpp"
 #include "object/hiInteger.hpp"
 #include "interpreter.hpp"
@@ -12,6 +11,10 @@
 #include "functionObject.hpp"
 #include "stringTable.hpp"
 #include "cellObject.hpp"
+#include "object/hiString.hpp"
+#include "object/hiInteger.hpp"
+#include "object/hiList.hpp"
+#include "object/hiDict.hpp"
 
 #define PUSH(x)       _frame->stack()->append((x))
 #define POP()         _frame->stack()->pop()
@@ -41,6 +44,14 @@ Interpreter::Interpreter() {
     _builtins->put(new HiString("None"), Universe::HiNone);
 
     _builtins->put(new HiString("len"), new FunctionObject(len));
+    _builtins->put(new HiString("type"), new FunctionObject(type_of));
+    _builtins->put(new HiString("isinstance"), new FunctionObject(isinstance));
+
+    _builtins->put(new HiString("int"), IntegerKlass::get_instance()->type_object());
+    _builtins->put(new HiString("object"), ObjectKlass::get_instance()->type_object());
+    _builtins->put(new HiString("str"), StringKlass::get_instance()->type_object());
+    _builtins->put(new HiString("list"), ListKlass::get_instance()->type_object());
+    _builtins->put(new HiString("dict"), DictKlass::get_instance()->type_object());
 }
 
 void Interpreter::run(CodeObject *codes) {

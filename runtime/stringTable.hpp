@@ -11,12 +11,14 @@ class HiString;
 class StringTable {
 private:
     static StringTable *instance;
+
     StringTable();
 
 public:
     static StringTable *get_instance();
 
     HiString *next_str;
+    HiString *mod_str;
 };
 
 #endif //PYTHONVM_STRINGTABLE_HPP

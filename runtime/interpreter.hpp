@@ -6,7 +6,6 @@
 #define PYTHONVM_INTERPRETER_HPP
 
 #include "code/codeObject.hpp"
-#include "util/map.hpp"
 #include "frameObject.hpp"
 
 class Interpreter {

@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 #include "object/klass.hpp"
+#include "object/hiDict.hpp"
 #include "object/hiString.hpp"
 #include "object/hiInteger.hpp"
 #include "runtime/universe.hpp"
@@ -12,7 +13,10 @@
 IntegerKlass *IntegerKlass::instance = NULL;
 
 IntegerKlass::IntegerKlass() {
+    set_klass_dict(new HiDict());
     set_name(new HiString("int"));
+    (new HiTypeObject())->set_own_klass(this);
+    set_super(ObjectKlass::get_instance());
 }
 
 IntegerKlass *IntegerKlass::get_instance() {

@@ -7,7 +7,9 @@
 
 #include "hiString.hpp"
 #include "hiInteger.hpp"
+#include "object/hiDict.hpp"
 #include "runtime/universe.hpp"
+#include "runtime/functionObject.hpp"
 
 StringKlass* StringKlass::instance = NULL;
 
@@ -19,6 +21,18 @@ StringKlass* StringKlass::get_instance() {
 }
 
 StringKlass::StringKlass() {
+}
+
+void StringKlass::initialize() {
+    (new HiTypeObject())->set_own_klass(this);
+
+    HiDict* klass_dict = new HiDict();
+    klass_dict->put(new HiString("upper"), new FunctionObject(string_upper));
+    set_klass_dict(klass_dict);
+
+    set_name(new HiString("str"));
+    set_super(ObjectKlass::get_instance());
+    (new HiTypeObject())->set_own_klass(this);
 }
 
 HiObject* StringKlass::equal(HiObject* x, HiObject* y) {
