@@ -29,6 +29,8 @@ public:
     virtual HiObject *contains(HiObject *x, HiObject *y);
 
     virtual HiObject *len(HiObject *x);
+
+    virtual HiObject *allocate_instance(ArrayList<HiObject *> *args);
 };
 
 class HiString : public HiObject {

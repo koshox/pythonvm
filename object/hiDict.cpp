@@ -126,6 +126,14 @@ void DictKlass::del_subscr(HiObject *x, HiObject *y) {
     ((HiDict *) x)->remove(y);
 }
 
+HiObject *DictKlass::allocate_instance(ArrayList<HiObject *> *args) {
+    if (!args || args->length() == 0) {
+        return new HiDict();
+    } else {
+        return NULL;
+    }
+}
+
 size_t DictKlass::size() {
     return sizeof(HiDict);
 }

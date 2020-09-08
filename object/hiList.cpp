@@ -179,6 +179,14 @@ HiObject *ListKlass::iter(HiObject *x) {
     return new ListIterator((HiList *) x);
 }
 
+HiObject *ListKlass::allocate_instance(ArrayList<HiObject *> *args) {
+    if (!args || args->length() == 0) {
+        return new HiList();
+    } else {
+        return NULL;
+    }
+}
+
 HiList::HiList() {
     set_klass(ListKlass::get_instance());
     _inner_list = new ArrayList<HiObject *>();

@@ -511,6 +511,10 @@ void Interpreter::build_frame(HiObject *callable, ObjList args, int op_arg) {
         FrameObject *frame = new FrameObject((FunctionObject *) callable, args, op_arg);
         frame->set_sender(_frame);
         _frame = frame;
+    } else if (callable->klass() == TypeKlass::get_instance()) {
+        HiObject *instance = ((HiTypeObject *) callable)->own_klass()->
+                allocate_instance(args);
+        PUSH(instance);
     }
 }
 

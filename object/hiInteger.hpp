@@ -29,6 +29,8 @@ public:
     virtual HiObject* mul(HiObject* x, HiObject* y);
     virtual HiObject* div(HiObject* x, HiObject* y);
     virtual HiObject* mod(HiObject* x, HiObject* y);
+
+    virtual HiObject *allocate_instance(ArrayList<HiObject *> *args);
 };
 
 class HiInteger : public HiObject {

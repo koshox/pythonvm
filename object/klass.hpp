@@ -62,8 +62,10 @@ public:
 
     virtual HiObject *contains(HiObject *x, HiObject *y) { return 0; }
 
-    virtual HiObject* next     (HiObject* x) { return 0; }
-    virtual HiObject* iter     (HiObject* x) { return 0; }
+    virtual HiObject *next     (HiObject* x) { return 0; }
+    virtual HiObject *iter     (HiObject* x) { return 0; }
+
+    virtual HiObject *allocate_instance(ArrayList<HiObject *> *args) { return 0;}
 };
 
 #endif //PYTHONVM_KLASS_HPP

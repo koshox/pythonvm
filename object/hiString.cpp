@@ -11,9 +11,9 @@
 #include "runtime/universe.hpp"
 #include "runtime/functionObject.hpp"
 
-StringKlass* StringKlass::instance = NULL;
+StringKlass *StringKlass::instance = NULL;
 
-StringKlass* StringKlass::get_instance() {
+StringKlass *StringKlass::get_instance() {
     if (instance == NULL)
         instance = new StringKlass();
 
@@ -26,7 +26,7 @@ StringKlass::StringKlass() {
 void StringKlass::initialize() {
     (new HiTypeObject())->set_own_klass(this);
 
-    HiDict* klass_dict = new HiDict();
+    HiDict *klass_dict = new HiDict();
     klass_dict->put(new HiString("upper"), new FunctionObject(string_upper));
     set_klass_dict(klass_dict);
 
@@ -35,15 +35,15 @@ void StringKlass::initialize() {
     (new HiTypeObject())->set_own_klass(this);
 }
 
-HiObject* StringKlass::equal(HiObject* x, HiObject* y) {
+HiObject *StringKlass::equal(HiObject *x, HiObject *y) {
     if (x->klass() != y->klass())
         return Universe::HiFalse;
 
-    HiString* sx = (HiString*) x;
-    HiString* sy = (HiString*) y;
+    HiString *sx = (HiString *) x;
+    HiString *sy = (HiString *) y;
 
-    assert(sx && sx->klass() == (Klass*)this);
-    assert(sy && sy->klass() == (Klass*)this);
+    assert(sx && sx->klass() == (Klass *) this);
+    assert(sy && sy->klass() == (Klass *) this);
 
     if (sx->length() != sy->length())
         return Universe::HiFalse;
@@ -76,17 +76,25 @@ HiString::HiString(const char *x, const int length) {
     set_klass(StringKlass::get_instance());
 }
 
-void StringKlass::print(HiObject* obj) {
-    HiString* str_obj = (HiString*) obj;
-    assert(str_obj && str_obj->klass() == (Klass*)this);
+void StringKlass::print(HiObject *obj) {
+    HiString *str_obj = (HiString *) obj;
+    assert(str_obj && str_obj->klass() == (Klass *) this);
 
     for (int i = 0; i < str_obj->length(); i++) {
         printf("%c", str_obj->value()[i]);
     }
 }
 
-HiObject* StringKlass::len(HiObject* x) {
-    return new HiInteger(((HiString*)x)->length());
+HiObject *StringKlass::len(HiObject *x) {
+    return new HiInteger(((HiString *) x)->length());
+}
+
+HiObject *StringKlass::allocate_instance(ArrayList<HiObject *> *args) {
+    if (!args || args->length() == 0) {
+        return new HiString("");
+    } else {
+        return NULL;
+    }
 }
 
 HiObject *StringKlass::less(HiObject *x, HiObject *y) {
@@ -120,12 +128,12 @@ HiObject *StringKlass::less(HiObject *x, HiObject *y) {
     return Universe::HiFalse;
 }
 
-HiObject* StringKlass::subscr(HiObject* x, HiObject* y) {
-    assert(x && x->klass() == (Klass*) this);
-    assert(y && y->klass() == (Klass*) IntegerKlass::get_instance());
+HiObject *StringKlass::subscr(HiObject *x, HiObject *y) {
+    assert(x && x->klass() == (Klass *) this);
+    assert(y && y->klass() == (Klass *) IntegerKlass::get_instance());
 
-    HiString * sx = (HiString*)x;
-    HiInteger* iy = (HiInteger*)y;
+    HiString *sx = (HiString *) x;
+    HiInteger *iy = (HiInteger *) y;
 
     return new HiString(&(sx->value()[iy->value()]), 1);
 }
