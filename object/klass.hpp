@@ -25,6 +25,8 @@ private:
 public:
     Klass();
 
+    static HiObject *create_klass(HiObject *x, HiObject *supers, HiObject *name);
+
     static int compare_klass(Klass* x, Klass* y);
 
     void set_type_object(HiTypeObject *x) { _type_object = x; }
@@ -65,7 +67,7 @@ public:
     virtual HiObject *next     (HiObject* x) { return 0; }
     virtual HiObject *iter     (HiObject* x) { return 0; }
 
-    virtual HiObject *allocate_instance(ArrayList<HiObject *> *args) { return 0;}
+    virtual HiObject *allocate_instance(HiObject* callable, ArrayList<HiObject *> *args);
 };
 
 #endif //PYTHONVM_KLASS_HPP

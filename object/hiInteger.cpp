@@ -182,7 +182,7 @@ HiObject *IntegerKlass::mod(HiObject *x, HiObject *y) {
     return new HiInteger(ix->value() % iy->value());
 }
 
-HiObject *IntegerKlass::allocate_instance(ArrayList<HiObject *> *args) {
+HiObject *IntegerKlass::allocate_instance(HiObject *callable, ArrayList<HiObject *> *args) {
     if (!args || args->length() == 0) {
         return new HiInteger(0);
     } else {

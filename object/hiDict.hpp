@@ -23,7 +23,7 @@ public:
     virtual void store_subscr(HiObject* x, HiObject* y, HiObject* z);
     virtual void del_subscr (HiObject* x, HiObject* y);
 
-    virtual HiObject *allocate_instance(ArrayList<HiObject *> *args);
+    virtual HiObject *allocate_instance(HiObject* callable, ArrayList<HiObject *> *args);
 
     virtual size_t size();
 };

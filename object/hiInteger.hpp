@@ -30,7 +30,7 @@ public:
     virtual HiObject* div(HiObject* x, HiObject* y);
     virtual HiObject* mod(HiObject* x, HiObject* y);
 
-    virtual HiObject *allocate_instance(ArrayList<HiObject *> *args);
+    virtual HiObject *allocate_instance(HiObject* callable, ArrayList<HiObject *> *args);
 };
 
 class HiInteger : public HiObject {

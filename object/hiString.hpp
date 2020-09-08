@@ -30,7 +30,7 @@ public:
 
     virtual HiObject *len(HiObject *x);
 
-    virtual HiObject *allocate_instance(ArrayList<HiObject *> *args);
+    virtual HiObject *allocate_instance(HiObject* callable, ArrayList<HiObject *> *args);
 };
 
 class HiString : public HiObject {

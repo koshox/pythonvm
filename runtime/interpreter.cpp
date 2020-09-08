@@ -187,11 +187,26 @@ void Interpreter::eval_frame() {
                 _frame->set_pc(b->_target);
                 break;
 
+            case ByteCode::LOAD_LOCALS:
+                PUSH(_frame->locals());
+                break;
+
             case ByteCode::POP_BLOCK:
                 b = _frame->_loop_stack->pop();
                 while (STACK_LEVEL() > b->_level) {
                     POP();
                 }
+                break;
+
+            case ByteCode::BUILD_CLASS:
+                // locals
+                v = POP();
+                // supers
+                u = POP();
+                // name
+                w = POP();
+                v = Klass::create_klass(v, u, w);
+                PUSH(v);
                 break;
 
             case ByteCode::STORE_NAME:
@@ -513,7 +528,7 @@ void Interpreter::build_frame(HiObject *callable, ObjList args, int op_arg) {
         _frame = frame;
     } else if (callable->klass() == TypeKlass::get_instance()) {
         HiObject *instance = ((HiTypeObject *) callable)->own_klass()->
-                allocate_instance(args);
+                allocate_instance(callable, args);
         PUSH(instance);
     }
 }
