@@ -21,6 +21,7 @@ public:
 class HiObject {
 private:
     Klass *_klass;
+    HiDict *_obj_dict;
 
 public:
     Klass *klass() {
@@ -56,6 +57,10 @@ public:
     HiObject *iter();
     HiObject *next();
     HiObject *len();
+
+    HiDict *obj_dict() { return _obj_dict; }
+    void set_obj_dict(HiDict *x) { _obj_dict = x; }
+    void init_dict();
 };
 
 /**
@@ -71,6 +76,8 @@ public:
     static TypeKlass *get_instance();
 
     virtual void print(HiObject *obj);
+
+    virtual HiObject *setattr(HiObject *x, HiObject *y, HiObject *z);
 };
 
 class HiTypeObject : public HiObject {

@@ -25,11 +25,15 @@ public:
 
     void build_frame(HiObject *pObject, ObjList args, int op_arg);
 
+    void enter_frame(FrameObject *frame);
+
     void eval_frame();
 
     void destroy_frame();
 
     void leave_frame();
+
+    HiObject *call_virtual(HiObject *func, ObjList args);
 };
 
 #endif //PYTHONVM_INTERPRETER_HPP

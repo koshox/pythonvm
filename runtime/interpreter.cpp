@@ -221,6 +221,13 @@ void Interpreter::eval_frame() {
                 }
                 break;
 
+            case ByteCode::STORE_ATTR:
+                u = POP();
+                v = _frame->names()->get(op_arg);
+                w = POP();
+                u->set_attr(v, w);
+                break;
+
             case ByteCode::DUP_TOPX:
                 for (int i = 0; i < op_arg; i++) {
                     int index = STACK_LEVEL() - op_arg;
@@ -493,7 +500,7 @@ void Interpreter::eval_frame() {
 
             case ByteCode::RETURN_VALUE:
                 _ret_value = POP();
-                if (_frame->is_first_frame()) {
+                if (_frame->is_first_frame() || _frame->is_entry_frame()) {
                     return;
                 }
 
@@ -536,4 +543,30 @@ void Interpreter::build_frame(HiObject *callable, ObjList args, int op_arg) {
 void Interpreter::leave_frame() {
     destroy_frame();
     PUSH(_ret_value);
+}
+
+HiObject *Interpreter::call_virtual(HiObject *func, ObjList args) {
+    if (func->klass() == MethodKlass::get_instance()) {
+        MethodObject *method = (MethodObject *) func;
+        if (!args) {
+            args = new ArrayList<HiObject *>(1);
+        }
+        args->insert(0, method->owner());
+        return call_virtual(method->func(), args);
+    } else if (MethodObject::is_function(func)) {
+        int size = args ? args->size() : 0;
+        FrameObject *frame = new FrameObject((FunctionObject *) func, args, size);
+        frame->set_entry_frame(true);
+        enter_frame(frame);
+        eval_frame();
+        destroy_frame();
+        return _ret_value;
+    }
+
+    return Universe::HiNone;
+}
+
+void Interpreter::enter_frame(FrameObject *frame) {
+    frame->set_sender(_frame);
+    _frame = frame;
 }

@@ -71,24 +71,15 @@ HiObject *HiObject::le(HiObject *rhs) {
 }
 
 HiObject *HiObject::get_attr(HiObject *x) {
-    HiObject *result = Universe::HiNone;
-    result = klass()->klass_dict()->get(x);
-
-    if (result == Universe::HiNone) {
-        return result;
-    }
-
-    if (MethodObject::is_function(result)) {
-        result = new MethodObject((FunctionObject *) result, this);
-    }
-
-    return result;
+    return klass()->getattr(this, x);
 }
 
-// TODO
 HiObject *HiObject::set_attr(HiObject *x, HiObject *y) {
-    // return klass()->klass_dict()->put(x, y);
-    return NULL;
+    return klass()->setattr(this, x, y);
+}
+
+void HiObject::init_dict() {
+    _obj_dict = new HiDict();
 }
 
 HiObject *HiObject::subscr(HiObject *x) {
@@ -144,6 +135,12 @@ void TypeKlass::print(HiObject *obj) {
 
     own_klass->name()->print();
     printf("'>");
+}
+
+HiObject *TypeKlass::setattr(HiObject *x, HiObject *y, HiObject *z) {
+    HiTypeObject *type_obj = (HiTypeObject *) x;
+    type_obj->own_klass()->klass_dict()->put(y, z);
+    return Universe::HiNone;
 }
 
 HiTypeObject::HiTypeObject() {

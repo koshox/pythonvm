@@ -24,6 +24,7 @@ FrameObject::FrameObject(CodeObject *codes) {
 
     _pc = 0;
     _sender = NULL;
+    _entry_frame = false;
 }
 
 FrameObject::FrameObject(FunctionObject *func, ObjList args, int op_arg) {
@@ -137,6 +138,7 @@ FrameObject::FrameObject(FunctionObject *func, ObjList args, int op_arg) {
 
     _pc = 0;
     _sender = NULL;
+    _entry_frame = false;
 }
 
 int FrameObject::get_op_arg() {
@@ -151,10 +153,6 @@ unsigned char FrameObject::get_op_code() {
 
 bool FrameObject::has_more_codes() {
     return _pc < _codes->_bytecodes->length();
-}
-
-bool FrameObject::is_first_frame() {
-    return _sender == NULL;
 }
 
 HiObject *FrameObject::get_cell_from_parameter(int i) {

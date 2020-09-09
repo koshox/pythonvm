@@ -41,6 +41,7 @@ public:
     void set_klass_dict(HiDict *dict) { _klass_dict = dict; }
     HiDict *klass_dict() { return _klass_dict; }
 
+    // TODO
     virtual void print(HiObject *obj) {};
 
     virtual HiObject* greater  (HiObject* x, HiObject* y) { return 0; }
@@ -63,6 +64,9 @@ public:
     virtual HiObject *len(HiObject *x) { return 0; }
 
     virtual HiObject *contains(HiObject *x, HiObject *y) { return 0; }
+
+    virtual HiObject *getattr(HiObject *x, HiObject *y);
+    virtual HiObject *setattr(HiObject *x, HiObject *y, HiObject *z);
 
     virtual HiObject *next     (HiObject* x) { return 0; }
     virtual HiObject *iter     (HiObject* x) { return 0; }

@@ -58,6 +58,8 @@ public:
     FrameObject *_sender;
     CodeObject *_codes;
     int _pc;
+    // 标记是否cpp调用python产生的栈帧
+    bool _entry_frame;
 
 public:
     void set_sender(FrameObject *x) { _sender = x; }
@@ -67,6 +69,12 @@ public:
     void set_pc(int x) { _pc = x; }
 
     int get_pc() { return _pc; }
+
+    void set_entry_frame(bool x) { _entry_frame = x; }
+
+    bool is_entry_frame() { return _entry_frame; }
+
+    bool is_first_frame() { return _sender == NULL; }
 
     HiList *stack() { return _stack; }
 
@@ -91,8 +99,6 @@ public:
     unsigned char get_op_code();
 
     int get_op_arg();
-
-    bool is_first_frame();
 };
 
 #endif //PYTHONVM_FRAMEOBJECT_HPP
