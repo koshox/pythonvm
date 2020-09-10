@@ -91,6 +91,10 @@ HiObject *Klass::add(HiObject *lhs, HiObject *rhs) {
     return find_and_call(lhs, args, ST(add));
 }
 
+HiObject *Klass::len(HiObject *x) {
+    return find_and_call(x, NULL, ST(len));
+}
+
 HiObject *Klass::getattr(HiObject *x, HiObject *y) {
     HiObject *result = Universe::HiNone;
 

@@ -10,6 +10,7 @@ StringTable::StringTable() {
     mod_str = new HiString("__module__");
     init_str = new HiString("__init__");
     add_str = new HiString("__add__");
+    len_str = new HiString("__len__");
 }
 
 StringTable *StringTable::instance = NULL;
