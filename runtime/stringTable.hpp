@@ -19,7 +19,8 @@ public:
 
     HiString *next_str;
     HiString *mod_str;
-    HiString* init_str;
+    HiString *init_str;
+    HiString *add_str;
 };
 
 #endif //PYTHONVM_STRINGTABLE_HPP

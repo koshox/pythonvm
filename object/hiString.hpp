@@ -22,6 +22,8 @@ public:
 
     virtual void print(HiObject *obj);
 
+    virtual HiObject *add(HiObject *x, HiObject *y);
+
     virtual HiObject *less(HiObject *x, HiObject *y);
 
     virtual HiObject *subscr(HiObject *x, HiObject *y);
@@ -30,10 +32,12 @@ public:
 
     virtual HiObject *len(HiObject *x);
 
-    virtual HiObject *allocate_instance(HiObject* callable, ArrayList<HiObject *> *args);
+    virtual HiObject *allocate_instance(HiObject *callable, ArrayList<HiObject *> *args);
 };
 
 class HiString : public HiObject {
+    friend class StringKlass;
+
 private:
     char *_value;
     int _length;
@@ -43,12 +47,18 @@ public:
 
     HiString(const char *x, const int length);
 
+    HiString(const int len);
+
     const char *value() {
         return _value;
     }
 
     int length() {
         return _length;
+    }
+
+    void set(int i, char x) {
+        _value[i] = x;
     }
 };
 

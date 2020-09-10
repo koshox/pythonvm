@@ -76,6 +76,12 @@ HiString::HiString(const char *x, const int length) {
     set_klass(StringKlass::get_instance());
 }
 
+HiString::HiString(const int length) {
+    _length = length;
+    _value = new char[length];
+    set_klass(StringKlass::get_instance());
+}
+
 void StringKlass::print(HiObject *obj) {
     HiString *str_obj = (HiString *) obj;
     assert(str_obj && str_obj->klass() == (Klass *) this);
@@ -83,6 +89,25 @@ void StringKlass::print(HiObject *obj) {
     for (int i = 0; i < str_obj->length(); i++) {
         printf("%c", str_obj->value()[i]);
     }
+}
+
+HiObject *StringKlass::add(HiObject *x, HiObject *y) {
+    assert(x && x->klass() == this);
+    assert(y && y->klass() == this);
+
+    HiString *sx = (HiString *) x;
+    HiString *sy = (HiString *) y;
+
+    HiString *sz = new HiString(sx->length() + sy->length());
+
+    memcpy(sz->_value, sx->_value, sx->length());
+    memcpy(sz->_value + sx->length(),
+           sy->_value,
+           sy->length());
+
+    sz->set(sx->length() + sy->length(), '\0');
+
+    return sz;
 }
 
 HiObject *StringKlass::len(HiObject *x) {

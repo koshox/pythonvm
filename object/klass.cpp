@@ -13,6 +13,9 @@
 #include "object/hiList.hpp"
 #include "runtime/universe.hpp"
 
+#define ST(x) StringTable::get_instance()->STR(x)
+#define STR(x) x##_str
+
 Klass::Klass() {
     _name = NULL;
 }
@@ -69,6 +72,25 @@ HiObject *Klass::allocate_instance(HiObject *callable, ArrayList<HiObject *> *ar
     return instance;
 }
 
+HiObject *Klass::find_and_call(HiObject *lhs, ObjList args, HiObject *func_name) {
+    HiObject *func = lhs->get_attr(func_name);
+    if (func != Universe::HiNone) {
+        return Interpreter::get_instance()->call_virtual(func, args);
+    }
+
+    printf("class ");
+    lhs->klass()->name()->print();
+    printf(" Error : unsupport operation for class ");
+    assert(false);
+    return Universe::HiNone;
+}
+
+HiObject *Klass::add(HiObject *lhs, HiObject *rhs) {
+    ObjList args = new ArrayList<HiObject *>();
+    args->add(rhs);
+    return find_and_call(lhs, args, ST(add));
+}
+
 HiObject *Klass::getattr(HiObject *x, HiObject *y) {
     HiObject *result = Universe::HiNone;
 
@@ -86,7 +108,7 @@ HiObject *Klass::getattr(HiObject *x, HiObject *y) {
     }
 
     if (MethodObject::is_function(result)) {
-        result = new MethodObject((FunctionObject *)result, x);
+        result = new MethodObject((FunctionObject *) result, x);
     }
 
     return result;

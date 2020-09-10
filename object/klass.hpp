@@ -22,6 +22,8 @@ private:
     HiString * _name;
     HiDict* _klass_dict;
 
+    HiObject *find_and_call(HiObject *x, ObjList args, HiObject *func_name);
+
 public:
     Klass();
 
@@ -51,7 +53,8 @@ public:
     virtual HiObject* ge       (HiObject* x, HiObject* y) { return 0; }
     virtual HiObject* le       (HiObject* x, HiObject* y) { return 0; }
 
-    virtual HiObject* add(HiObject* x, HiObject* y) { return 0; }
+    virtual HiObject* add(HiObject* x, HiObject* y);
+    // TODO operator overload
     virtual HiObject* sub(HiObject* x, HiObject* y) { return 0; }
     virtual HiObject* mul(HiObject* x, HiObject* y) { return 0; }
     virtual HiObject* div(HiObject* x, HiObject* y) { return 0; }
