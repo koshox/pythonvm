@@ -14,6 +14,8 @@ StringTable::StringTable() {
     call_str = new HiString("__call__");
     getitem_str = new HiString("__getitem__");
     setitem_str = new HiString("__setitem__");
+    getattr_str = new HiString("__getattr__");
+    setattr_str = new HiString("__setattr__");
 }
 
 StringTable *StringTable::instance = NULL;

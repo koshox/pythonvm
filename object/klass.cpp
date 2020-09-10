@@ -65,7 +65,7 @@ HiObject *Klass::allocate_instance(HiObject *callable, ArrayList<HiObject *> *ar
     HiObject *instance = new HiObject();
     instance->set_klass(((HiTypeObject *) callable)->own_klass());
     HiObject *constructor = instance->get_attr(StringTable::get_instance()->init_str);
-    if (constructor != Universe::HiNone) {
+    if (constructor != Universe::HiNone && constructor != NULL) {
         Interpreter::get_instance()->call_virtual(constructor, args);
     }
 
@@ -109,6 +109,14 @@ void Klass::store_subscr(HiObject *x, HiObject *y, HiObject *z) {
 }
 
 HiObject *Klass::getattr(HiObject *x, HiObject *y) {
+    HiObject *func = x->klass()->klass_dict()->get(ST(getattr));
+    if (func->klass() == FunctionKlass::get_instance()) {
+        func = new MethodObject((FunctionObject *) func, x);
+        ObjList args = new ArrayList<HiObject *>();
+        args->add(y);
+        return Interpreter::get_instance()->call_virtual(func, args);
+    }
+
     HiObject *result = Universe::HiNone;
 
     if (x->obj_dict() != NULL) {
@@ -132,6 +140,15 @@ HiObject *Klass::getattr(HiObject *x, HiObject *y) {
 }
 
 HiObject *Klass::setattr(HiObject *x, HiObject *y, HiObject *z) {
+    HiObject *func = x->klass()->klass_dict()->get(ST(setattr));
+    if (func->klass() == FunctionKlass::get_instance()) {
+        func = new MethodObject((FunctionObject *) func, x);
+        ObjList args = new ArrayList<HiObject *>();
+        args->add(y);
+        args->add(z);
+        return Interpreter::get_instance()->call_virtual(func, args);
+    }
+
     if (x->obj_dict() == NULL) {
         x->init_dict();
     }

@@ -25,6 +25,8 @@ public:
     HiString *call_str;
     HiString *getitem_str;
     HiString *setitem_str;
+    HiString *getattr_str;
+    HiString *setattr_str;
 };
 
 #endif //PYTHONVM_STRINGTABLE_HPP

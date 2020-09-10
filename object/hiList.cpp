@@ -124,7 +124,7 @@ HiObject *ListKlass::contains(HiObject *x, HiObject *y) {
 
     int size = lx->inner_list()->size();
     for (int i = 0; i < size; ++i) {
-        if (lx->inner_list()->get(i)->equal(y)) {
+        if (lx->inner_list()->get(i)->equal(y) == Universe::HiTrue) {
             return Universe::HiTrue;
         }
     }

@@ -21,7 +21,7 @@ public:
 class HiObject {
 private:
     Klass *_klass;
-    HiDict *_obj_dict;
+    HiDict *_obj_dict = NULL;
 
 public:
     Klass *klass() {
