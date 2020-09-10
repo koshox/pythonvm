@@ -95,6 +95,19 @@ HiObject *Klass::len(HiObject *x) {
     return find_and_call(x, NULL, ST(len));
 }
 
+HiObject *Klass::subscr(HiObject *x, HiObject *y) {
+    ObjList args = new ArrayList<HiObject *>();
+    args->add(y);
+    return find_and_call(x, args, ST(getitem));
+}
+
+void Klass::store_subscr(HiObject *x, HiObject *y, HiObject *z) {
+    ObjList args = new ArrayList<HiObject *>();
+    args->add(y);
+    args->add(z);
+    find_and_call(x, args, ST(setitem));
+}
+
 HiObject *Klass::getattr(HiObject *x, HiObject *y) {
     HiObject *result = Universe::HiNone;
 

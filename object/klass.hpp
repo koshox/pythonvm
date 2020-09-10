@@ -60,8 +60,8 @@ public:
     virtual HiObject* div(HiObject* x, HiObject* y) { return 0; }
     virtual HiObject* mod(HiObject* x, HiObject* y) { return 0; }
 
-    virtual HiObject *subscr(HiObject *x, HiObject *y) { return 0; }
-    virtual void store_subscr(HiObject *x, HiObject *y, HiObject *z) { return; }
+    virtual HiObject *subscr(HiObject *x, HiObject *y);
+    virtual void store_subscr(HiObject *x, HiObject *y, HiObject *z);
     virtual void del_subscr(HiObject *x, HiObject *y) { return;}
 
     virtual HiObject *len(HiObject *x);
