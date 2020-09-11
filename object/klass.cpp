@@ -65,7 +65,7 @@ HiObject *Klass::allocate_instance(HiObject *callable, ArrayList<HiObject *> *ar
     HiObject *instance = new HiObject();
     instance->set_klass(((HiTypeObject *) callable)->own_klass());
     HiObject *constructor = instance->get_attr(StringTable::get_instance()->init_str);
-    if (constructor != Universe::HiNone && constructor != NULL) {
+    if (constructor != Universe::HiNone) {
         Interpreter::get_instance()->call_virtual(constructor, args);
     }
 

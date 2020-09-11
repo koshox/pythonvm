@@ -5,8 +5,9 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "../util/bufferedInputStream.hpp"
-#include "../object/hiInteger.hpp"
+#include "runtime/universe.hpp"
+#include "util/bufferedInputStream.hpp"
+#include "object/hiInteger.hpp"
 #include "binaryFileParser.hpp"
 
 BinaryFileParser::BinaryFileParser(BufferedInputStream *stream) {
@@ -172,8 +173,7 @@ ArrayList<HiObject *> *BinaryFileParser::get_tuple() {
                 list->add(new HiInteger(file_stream->read_int()));
                 break;
             case 'N':
-                // None Object
-                list->add(NULL);
+                list->add(Universe::HiNone);
                 break;
             case 't':
                 // String
