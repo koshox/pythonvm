@@ -17,6 +17,7 @@ private:
 
 public:
     static ListKlass *get_instance();
+    void initialize();
 
     virtual HiObject *add(HiObject *x, HiObject *y);
     virtual HiObject *mul(HiObject *x, HiObject *y);
@@ -51,6 +52,9 @@ public:
     HiObject* get(int index)            { return _inner_list->get(index); }
     void      set(int i, HiObject* o)   { _inner_list->set(i, o); }
     HiObject* top()                     { return get(size() - 1); }
+
+    int index(HiObject *obj);
+    void delete_index(int index) { _inner_list->delete_index(index); }
 };
 
 HiObject *list_append(ObjList args);

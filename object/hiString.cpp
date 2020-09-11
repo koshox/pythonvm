@@ -31,7 +31,7 @@ void StringKlass::initialize() {
     set_klass_dict(klass_dict);
 
     set_name(new HiString("str"));
-    set_super(ObjectKlass::get_instance());
+    add_super(ObjectKlass::get_instance());
     (new HiTypeObject())->set_own_klass(this);
 }
 

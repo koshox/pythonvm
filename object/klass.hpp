@@ -17,13 +17,14 @@ class HiList;
 
 class Klass {
 private:
-    Klass *_super;
+    HiList *_super;
+    HiList *_mro;
     HiTypeObject *_type_object;
     HiString * _name;
     HiDict* _klass_dict;
 
     HiObject *find_and_call(HiObject *x, ObjList args, HiObject *func_name);
-
+    HiObject *find_in_parents(HiObject *x, HiObject *y);
 public:
     Klass();
 
@@ -34,8 +35,12 @@ public:
     void set_type_object(HiTypeObject *x) { _type_object = x; }
     HiTypeObject *type_object() { return _type_object; }
 
-    void set_super(Klass *x) { _super = x; }
-    Klass *super() { return _super; }
+    void add_super(Klass *x);
+    HiTypeObject *super();
+    void order_supers();
+
+    void set_super_list(HiList *x) { _super = x; }
+    HiList *mro() { return _mro; }
 
     void set_name(HiString * x) { _name = x; }
     HiString *name() const { return _name; }

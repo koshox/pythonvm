@@ -17,7 +17,10 @@
 #define STR(x) x##_str
 
 Klass::Klass() {
+    _klass_dict = NULL;
     _name = NULL;
+    _super = NULL;
+    _mro = NULL;
 }
 
 int Klass::compare_klass(Klass *x, Klass *y) {
@@ -49,11 +52,8 @@ HiObject *Klass::create_klass(HiObject *x, HiObject *supers, HiObject *name) {
 
     new_klass->set_klass_dict(klass_dict);
     new_klass->set_name((HiString *) name);
-    // TODO 暂时先处理单继承
-    if (supers_list->inner_list()->length() > 0) {
-        HiTypeObject *super = (HiTypeObject *) supers_list->inner_list()->get(0);
-        new_klass->set_super(super->own_klass());
-    }
+    new_klass->set_super_list(supers_list);
+    new_klass->order_supers();
 
     HiTypeObject *type_obj = new HiTypeObject();
     type_obj->set_own_klass(new_klass);
@@ -85,6 +85,29 @@ HiObject *Klass::find_and_call(HiObject *lhs, ObjList args, HiObject *func_name)
     return Universe::HiNone;
 }
 
+HiObject *Klass::find_in_parents(HiObject *x, HiObject *y) {
+    HiObject *result = Universe::HiNone;
+    result = x->klass()->klass_dict()->get(y);
+
+    if (result != Universe::HiNone) {
+        return result;
+    }
+
+    // find attribute in all parents.
+    if (x->klass()->mro() == NULL) {
+        return result;
+    }
+
+    for (int i = 0; i < x->klass()->mro()->size(); i++) {
+        result = ((HiTypeObject *) (x->klass()->mro()->get(i)))->own_klass()->klass_dict()->get(y);
+        if (result != Universe::HiNone) {
+            return result;
+        }
+    }
+
+    return result;
+}
+
 HiObject *Klass::add(HiObject *lhs, HiObject *rhs) {
     ObjList args = new ArrayList<HiObject *>();
     args->add(rhs);
@@ -109,7 +132,7 @@ void Klass::store_subscr(HiObject *x, HiObject *y, HiObject *z) {
 }
 
 HiObject *Klass::getattr(HiObject *x, HiObject *y) {
-    HiObject *func = x->klass()->klass_dict()->get(ST(getattr));
+    HiObject *func = find_in_parents(x, ST(getattr));
     if (func->klass() == FunctionKlass::get_instance()) {
         func = new MethodObject((FunctionObject *) func, x);
         ObjList args = new ArrayList<HiObject *>();
@@ -126,12 +149,7 @@ HiObject *Klass::getattr(HiObject *x, HiObject *y) {
         }
     }
 
-    result = x->klass()->klass_dict()->get(y);
-
-    if (result == Universe::HiNone) {
-        return result;
-    }
-
+    result = find_in_parents(x, y);
     if (MethodObject::is_function(result)) {
         result = new MethodObject((FunctionObject *) result, x);
     }
@@ -155,4 +173,67 @@ HiObject *Klass::setattr(HiObject *x, HiObject *y, HiObject *z) {
 
     x->obj_dict()->put(y, z);
     return Universe::HiNone;
+}
+
+void Klass::add_super(Klass *klass) {
+    if (_super == NULL) {
+        _super = new HiList();
+    }
+
+    _super->append(klass->type_object());
+}
+
+HiTypeObject *Klass::super() {
+    if (_super == NULL) {
+        return NULL;
+    }
+
+    if (_super->size() <= 0) {
+        return NULL;
+    }
+
+    return (HiTypeObject *) _super->get(0);
+}
+
+void Klass::order_supers() {
+    if (_super == NULL) {
+        return;
+    }
+
+    if (_mro == NULL) {
+        _mro = new HiList();
+    }
+
+    int cur = -1;
+    for (int i = 0; i < _super->size(); ++i) {
+        HiTypeObject *tp_obj = (HiTypeObject *) (_super->get(i));
+        Klass *k = tp_obj->own_klass();
+        _mro->append(tp_obj);
+        if (k->mro() == NULL) {
+            continue;
+        }
+
+        for (int j = 0; j < k->mro()->size(); ++j) {
+            HiTypeObject *tp_obj = (HiTypeObject *) (k->mro()->get(j));
+            int index = _mro->index(tp_obj);
+            if (index < cur) {
+                printf("Error: method resolution order conflicts.\n");
+                assert(false);
+            }
+
+            cur = index;
+            if (index >= 0) {
+                _mro->delete_index(index);
+            }
+            _mro->append(tp_obj);
+        }
+    }
+
+    printf("%s's mro is ", _name->value());
+    for (int i = 0; i < _mro->size(); i++) {
+        HiTypeObject *tp_obj = (HiTypeObject *) (_mro->get(i));
+        Klass *k = tp_obj->own_klass();
+        printf("%s, ", k->name()->value());
+    }
+    printf("\n");
 }

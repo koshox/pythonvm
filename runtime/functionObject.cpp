@@ -4,6 +4,7 @@
 
 #include "object/hiInteger.hpp"
 #include "object/hiString.hpp"
+#include "object/hiList.hpp"
 #include "object/hiDict.hpp"
 #include "runtime/universe.hpp"
 #include "runtime/functionObject.hpp"
@@ -11,7 +12,10 @@
 FunctionKlass *FunctionKlass::instance = NULL;
 
 FunctionKlass::FunctionKlass() {
+    add_super(ObjectKlass::get_instance());
     set_name(new HiString("function"));
+    HiTypeObject *tp_obj = new HiTypeObject();
+    tp_obj->set_own_klass(this);
 }
 
 FunctionKlass *FunctionKlass::get_instance() {
@@ -36,8 +40,8 @@ FunctionObject::FunctionObject(HiObject *code_object) {
     _func_code = co;
     _func_name = co->_co_name;
     _flags = co->_flag;
-    _globals   = NULL;
-    _closure   = NULL;
+    _globals = NULL;
+    _closure = NULL;
 
     set_klass(FunctionKlass::get_instance());
 }
@@ -46,20 +50,20 @@ FunctionObject::FunctionObject(NativeFuncPointer nfp) {
     _func_code = NULL;
     _func_name = NULL;
     _flags = 0;
-    _globals   = NULL;
-    _closure   = NULL;
+    _globals = NULL;
+    _closure = NULL;
     _native_func = nfp;
 
     set_klass(NativeFunctionKlass::get_instance());
 }
 
-void FunctionObject::set_default(ArrayList<HiObject*>* defaults) {
+void FunctionObject::set_default(ArrayList<HiObject *> *defaults) {
     if (defaults == NULL) {
         _defaults = NULL;
         return;
     }
 
-    _defaults = new ArrayList<HiObject*>(defaults->length());
+    _defaults = new ArrayList<HiObject *>(defaults->length());
 
     for (int i = 0; i < defaults->length(); i++) {
         _defaults->set(i, defaults->get(i));
@@ -70,7 +74,7 @@ HiObject *FunctionObject::call(ObjList args) {
     return (*_native_func)(args);
 }
 
-NativeFunctionKlass* NativeFunctionKlass::instance = NULL;
+NativeFunctionKlass *NativeFunctionKlass::instance = NULL;
 
 NativeFunctionKlass *NativeFunctionKlass::get_instance() {
     if (instance == NULL)
@@ -80,17 +84,22 @@ NativeFunctionKlass *NativeFunctionKlass::get_instance() {
 }
 
 NativeFunctionKlass::NativeFunctionKlass() {
-    // set_super(FunctionKlass::get_instance());
+    add_super(FunctionKlass::get_instance());
     set_name(new HiString("native function"));
+    HiTypeObject *tp_obj = new HiTypeObject();
+    tp_obj->set_own_klass(this);
 }
 
 MethodKlass::MethodKlass() {
-    set_klass_dict(new HiDict());
+    add_super(FunctionKlass::get_instance());
+    set_name(new HiString("method"));
+    HiTypeObject *tp_obj = new HiTypeObject();
+    tp_obj->set_own_klass(this);
 }
 
-MethodKlass* MethodKlass::instance = NULL;
+MethodKlass *MethodKlass::instance = NULL;
 
-MethodKlass* MethodKlass::get_instance() {
+MethodKlass *MethodKlass::get_instance() {
     if (instance == NULL)
         instance = new MethodKlass();
 
@@ -103,9 +112,15 @@ bool MethodObject::is_function(HiObject *x) {
         return true;
     }
 
-    // TODO
-    if (k == (Klass *) NativeFunctionKlass::get_instance()) {
-        return true;
+    if (k->mro() == NULL) {
+        return false;
+    }
+
+    for (int i = 0; i < k->mro()->size(); i++) {
+        if (k->mro()->get(i) ==
+            FunctionKlass::get_instance()->type_object()) {
+            return true;
+        }
     }
 
     return false;
@@ -122,12 +137,13 @@ HiObject *isinstance(ObjList args) {
     assert(y && y->klass() == TypeKlass::get_instance());
 
     Klass *k = x->klass();
-    while (k != NULL) {
-        if (k == ((HiTypeObject *) y)->own_klass()) {
+    if (k->type_object() == y)
+        return Universe::HiTrue;
+
+    for (int i = 0; i < k->mro()->size(); i++) {
+        if (k->mro()->get(i) == y) {
             return Universe::HiTrue;
         }
-
-        k = k->super();
     }
 
     return Universe::HiFalse;

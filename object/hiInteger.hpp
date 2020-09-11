@@ -14,6 +14,7 @@ private:
 
 public:
     static IntegerKlass *get_instance();
+    void initialize();
 
     virtual void print(HiObject* obj);
 
