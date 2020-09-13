@@ -5,11 +5,12 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "hiString.hpp"
-#include "hiInteger.hpp"
+#include "object/hiString.hpp"
+#include "object/hiInteger.hpp"
 #include "object/hiDict.hpp"
 #include "runtime/universe.hpp"
 #include "runtime/functionObject.hpp"
+#include "memory/heap.hpp"
 
 StringKlass *StringKlass::instance = NULL;
 
@@ -58,7 +59,8 @@ HiObject *StringKlass::equal(HiObject *x, HiObject *y) {
 
 HiString::HiString(const char *x) {
     _length = strlen(x);
-    _value = new char[_length];
+    // _value = new char[_length];
+    _value = (char*)Universe::heap->allocate(_length);
     strcpy(_value, x);
 
     set_klass(StringKlass::get_instance());
@@ -66,7 +68,8 @@ HiString::HiString(const char *x) {
 
 HiString::HiString(const char *x, const int length) {
     _length = length;
-    _value = new char[length];
+    // _value = new char[length];
+    _value = (char*)Universe::heap->allocate(_length);
 
     // do not use strcpy here, since '\0' is allowed.
     for (int i = 0; i < length; ++i) {
@@ -78,7 +81,8 @@ HiString::HiString(const char *x, const int length) {
 
 HiString::HiString(const int length) {
     _length = length;
-    _value = new char[length];
+    // _value = new char[length];
+    _value = (char*)Universe::heap->allocate(_length + 1);
     set_klass(StringKlass::get_instance());
 }
 

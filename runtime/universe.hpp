@@ -6,12 +6,15 @@
 #define PYTHONVM_UNIVERSE_HPP
 
 #include <stdio.h>
-#include <object/hiInteger.hpp>
 
 class Klass;
+class Heap;
 class HiInteger;
 class HiObject;
 class CodeObject;
+
+template <typename T>
+class ArrayList;
 
 class Universe {
 public:
@@ -19,6 +22,10 @@ public:
     static HiObject *HiFalse;
 
     static HiObject *HiNone;
+
+    static ArrayList<Klass*>* klasses;
+
+    static Heap *heap;
 
 public:
     static void genesis();

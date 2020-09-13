@@ -1,16 +1,20 @@
 //
 // Created by Kosho on 2020/8/14.
 //
+#include <new>
 
-#include "arrayList.hpp"
+#include "util/arrayList.hpp"
 #include "object/hiObject.hpp"
 #include "runtime/universe.hpp"
+#include "memory/heap.hpp"
 
 template<typename T>
 ArrayList<T>::ArrayList(int n) {
     _length = n;
     _size = 0;
-    _array = new T[n];
+    // _array = new T[n];
+    void *temp = Universe::heap->allocate(sizeof(T) * n);
+    _array = new(temp)T[n];
 }
 
 template<typename T>
@@ -33,12 +37,16 @@ void ArrayList<T>::insert(int index, T t) {
 
 template<typename T>
 void ArrayList<T>::expand() {
-    T *new_array = new T[_length << 1];
+    // T *new_array = new T[_length << 1];
+    void *temp = Universe::heap->allocate(sizeof(T) * (_length << 1));
+    T *new_array = new (temp)T[_length << 1];
+
     for (int i = 0; i < _length; ++i) {
         new_array[i] = _array[i];
     }
 
-    delete[] _array;
+    // we do not rely on this, but gc.
+    // delete[] _array;
     _array = new_array;
 
     _length <<= 1;
@@ -87,13 +95,13 @@ void ArrayList<T>::delete_index(int index) {
     _size--;
 }
 
-template <typename T>
+template<typename T>
 int ArrayList<T>::index(T t) {
     return 0;
 }
 
-template <>
-int ArrayList<HiObject*>::index(HiObject* t) {
+template<>
+int ArrayList<HiObject *>::index(HiObject *t) {
     for (int i = 0; i < _size; i++) {
         if (_array[i]->equal(t) == Universe::HiTrue) {
             return i;
@@ -103,6 +111,11 @@ int ArrayList<HiObject*>::index(HiObject* t) {
     return -1;
 }
 
+template<typename T>
+void *ArrayList<T>::operator new(size_t size) {
+    return Universe::heap->allocate(size);
+}
+
 class HiObject;
 template class ArrayList<HiObject *>;
 
@@ -110,4 +123,7 @@ class HiString;
 template class ArrayList<HiString *>;
 
 class Block;
-template class ArrayList<Block*>;
+template class ArrayList<Block *>;
+
+class Klass;
+template class ArrayList<Klass *>;

@@ -80,6 +80,8 @@ public:
     virtual HiObject *iter     (HiObject* x) { return 0; }
 
     virtual HiObject *allocate_instance(HiObject* callable, ArrayList<HiObject *> *args);
+
+    void* operator new(size_t size);
 };
 
 #endif //PYTHONVM_KLASS_HPP

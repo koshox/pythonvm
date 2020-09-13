@@ -2,21 +2,23 @@
 // Created by Kosho on 2020/8/16.
 //
 
-#include <runtime/interpreter.hpp>
+#include "klass.hpp"
+#include "runtime/interpreter.hpp"
 #include "runtime/stringTable.hpp"
 #include "runtime/functionObject.hpp"
-#include "klass.hpp"
+#include "runtime/universe.hpp"
 #include "object/hiObject.hpp"
 #include "object/hiInteger.hpp"
 #include "object/hiString.hpp"
 #include "object/hiDict.hpp"
 #include "object/hiList.hpp"
-#include "runtime/universe.hpp"
+#include "memory/heap.hpp"
 
 #define ST(x) StringTable::get_instance()->STR(x)
 #define STR(x) x##_str
 
 Klass::Klass() {
+    Universe::klasses->add(this);
     _klass_dict = NULL;
     _name = NULL;
     _super = NULL;
@@ -236,4 +238,8 @@ void Klass::order_supers() {
         printf("%s, ", k->name()->value());
     }
     printf("\n");
+}
+
+void *Klass::operator new(size_t size) {
+    return Universe::heap->allocate_meta(size);
 }

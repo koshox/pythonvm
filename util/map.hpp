@@ -5,6 +5,8 @@
 #ifndef PYTHONVM_MAP_HPP
 #define PYTHONVM_MAP_HPP
 
+#include <stdio.h>
+
 template<typename K, typename V>
 class MapEntry {
 public:
@@ -16,6 +18,8 @@ public:
     MapEntry(K k, V v) : _k(k), _v(v) {}
 
     MapEntry() : _k(0), _v(0) {}
+
+    void *operator new[](size_t size);
 };
 
 template<typename K, typename V>
@@ -47,6 +51,8 @@ public:
     int index(K k);
 
     MapEntry<K, V> *entries() { return _entries; }
+
+    void *operator new(size_t size);
 };
 
 #endif //PYTHONVM_MAP_HPP

@@ -5,6 +5,7 @@
 #include "util/map.hpp"
 #include "runtime/universe.hpp"
 #include "object/hiObject.hpp"
+#include "memory/heap.hpp"
 
 template<typename K, typename V>
 Map<K, V>::Map() {
@@ -90,9 +91,19 @@ void Map<K, V>::expand() {
             new_entries[i] = _entries[i];
         }
         _length <<= 1;
-        delete[] _entries;
+        // delete[] _entries;
         _entries = new_entries;
     }
+}
+
+template<typename K, typename V>
+void *MapEntry<K, V>::operator new[](size_t size) {
+    return Universe::heap->allocate(size);
+}
+
+template<typename K, typename V>
+void *Map<K, V>::operator new(size_t size) {
+    return Universe::heap->allocate(size);
 }
 
 template class Map<HiObject *, HiObject *>;

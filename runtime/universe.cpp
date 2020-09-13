@@ -3,17 +3,28 @@
 //
 
 #include "runtime/universe.hpp"
+#include "runtime/interpreter.hpp"
+#include "runtime/functionObject.hpp"
+#include "object/hiInteger.hpp"
+#include "object/hiObject.hpp"
 #include "object/hiString.hpp"
-#include "object/hiDict.hpp"
 #include "object/hiList.hpp"
-#include "functionObject.hpp"
+#include "object/hiDict.hpp"
+#include "memory/heap.hpp"
 
 HiObject *Universe::HiTrue = NULL;
 HiObject *Universe::HiFalse = NULL;
 
 HiObject *Universe::HiNone = NULL;
 
+Heap *Universe::heap = NULL;
+
+ArrayList<Klass *> *Universe::klasses = NULL;
+
 void Universe::genesis() {
+    heap = Heap::get_instance();
+    klasses = new ArrayList<Klass *>();
+
     HiTrue = new HiString("True");
     HiFalse = new HiString("False");
     HiNone = new HiString("None");

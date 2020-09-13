@@ -25,7 +25,7 @@ ADD_EXECUTABLE(pythonvm main.cpp
         #runtime/traceback.cpp
         #runtime/generator.cpp
         runtime/cellObject.cpp
-        #memory/heap.cpp
+        memory/heap.cpp
         #memory/oopClosure.cpp
         code/binaryFileParser.cpp
         code/codeObject.cpp)

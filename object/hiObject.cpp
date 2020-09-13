@@ -9,6 +9,7 @@
 #include "object/hiString.hpp"
 #include "runtime/universe.hpp"
 #include "runtime/functionObject.hpp"
+#include "memory/heap.hpp"
 
 ObjectKlass *ObjectKlass::instance = NULL;
 
@@ -108,6 +109,10 @@ HiObject *HiObject::next() {
 
 HiObject *HiObject::len() {
     return klass()->len(this);
+}
+
+void* HiObject::operator new(size_t size) {
+    return Universe::heap->allocate(size);
 }
 
 TypeKlass *TypeKlass::instance = NULL;

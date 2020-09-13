@@ -38,6 +38,8 @@ public:
     T pop();
 
     void delete_index(int index);
+
+    void *operator new(size_t size);
 };
 
 class HiObject;
