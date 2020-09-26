@@ -7,6 +7,7 @@
 #include "object/hiObject.hpp"
 #include "runtime/universe.hpp"
 #include "memory/heap.hpp"
+#include "memory/oopClosure.hpp"
 
 template<typename T>
 ArrayList<T>::ArrayList(int n) {
@@ -114,6 +115,32 @@ int ArrayList<HiObject *>::index(HiObject *t) {
 template<typename T>
 void *ArrayList<T>::operator new(size_t size) {
     return Universe::heap->allocate(size);
+}
+
+template<typename T>
+void ArrayList<T>::oops_do(OopClosure *closure) {
+    closure->do_raw_mem((char **) (&_array),
+                        _length * sizeof(T));
+}
+
+template<>
+void ArrayList<Klass *>::oops_do(OopClosure *closure) {
+    closure->do_raw_mem((char **) (&_array),
+                        _length * sizeof(Klass *));
+
+    for (int i = 0; i < size(); i++) {
+        closure->do_klass((Klass **) &_array[i]);
+    }
+}
+
+template<>
+void ArrayList<HiObject *>::oops_do(OopClosure *closure) {
+    closure->do_raw_mem((char **) (&_array),
+                        _length * sizeof(HiObject *));
+
+    for (int i = 0; i < size(); i++) {
+        closure->do_oop((HiObject **) &_array[i]);
+    }
 }
 
 class HiObject;

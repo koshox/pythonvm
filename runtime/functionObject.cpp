@@ -8,6 +8,7 @@
 #include "object/hiDict.hpp"
 #include "runtime/universe.hpp"
 #include "runtime/functionObject.hpp"
+#include "memory/oopClosure.hpp"
 
 FunctionKlass *FunctionKlass::instance = NULL;
 
@@ -32,6 +33,21 @@ void FunctionKlass::print(HiObject *obj) {
     assert(fo && fo->klass() == (Klass *) this);
     fo->func_name()->print();
     printf(">");
+}
+
+size_t FunctionKlass::size() {
+    return sizeof(FunctionKlass);
+}
+
+void FunctionKlass::oops_do(OopClosure *f, HiObject *obj) {
+    FunctionObject *fo = (FunctionObject *) obj;
+    assert(fo->klass() == (Klass *) this);
+
+    f->do_oop((HiObject **) &fo->_func_code);
+    f->do_oop((HiObject **) &fo->_func_name);
+    f->do_oop((HiObject **) &fo->_globals);
+    f->do_oop((HiObject **) &fo->_closure);
+    f->do_array_list(&fo->_defaults);
 }
 
 FunctionObject::FunctionObject(HiObject *code_object) {
@@ -90,6 +106,21 @@ NativeFunctionKlass::NativeFunctionKlass() {
     tp_obj->set_own_klass(this);
 }
 
+size_t NativeFunctionKlass::size() {
+    return sizeof(FunctionObject);
+}
+
+void NativeFunctionKlass::oops_do(OopClosure *f, HiObject *obj) {
+    FunctionObject *fo = (FunctionObject *) obj;
+    assert(fo->klass() == (Klass *) this);
+
+    f->do_oop((HiObject **) &fo->_func_code);
+    f->do_oop((HiObject **) &fo->_func_name);
+    f->do_oop((HiObject **) &fo->_globals);
+    f->do_oop((HiObject **) &fo->_closure);
+    f->do_array_list(&fo->_defaults);
+}
+
 MethodKlass::MethodKlass() {
     add_super(FunctionKlass::get_instance());
     set_name(new HiString("method"));
@@ -104,6 +135,18 @@ MethodKlass *MethodKlass::get_instance() {
         instance = new MethodKlass();
 
     return instance;
+}
+
+size_t MethodKlass::size() {
+    return sizeof(MethodKlass);
+}
+
+void MethodKlass::oops_do(OopClosure *f, HiObject *obj) {
+    MethodObject *mo = (MethodObject *) obj;
+    assert(mo->klass() == (Klass *) this);
+
+    f->do_oop((HiObject **) &mo->_owner);
+    f->do_oop((HiObject **) &mo->_func);
 }
 
 bool MethodObject::is_function(HiObject *x) {
@@ -178,3 +221,4 @@ HiObject *string_upper(ObjList args) {
     delete[]v;
     return s;
 }
+

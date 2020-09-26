@@ -11,6 +11,7 @@
 #include "object/hiList.hpp"
 #include "object/hiDict.hpp"
 #include "memory/heap.hpp"
+#include "memory/oopClosure.hpp"
 
 HiObject *Universe::HiTrue = NULL;
 HiObject *Universe::HiFalse = NULL;
@@ -18,6 +19,8 @@ HiObject *Universe::HiFalse = NULL;
 HiObject *Universe::HiNone = NULL;
 
 Heap *Universe::heap = NULL;
+
+CodeObject *Universe::main_code = NULL;
 
 ArrayList<Klass *> *Universe::klasses = NULL;
 
@@ -65,3 +68,12 @@ void Universe::genesis() {
 }
 
 void Universe::destory() {}
+
+void Universe::oops_do(OopClosure *closure) {
+    closure->do_oop((HiObject **) &HiTrue);
+    closure->do_oop((HiObject **) &HiFalse);
+    closure->do_oop((HiObject **) &HiNone);
+
+    closure->do_oop((HiObject **) &main_code);
+    closure->do_array_list(&klasses);
+}

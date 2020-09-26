@@ -14,6 +14,7 @@ class HiObject;
 class HiString;
 class HiDict;
 class HiList;
+class OopClosure;
 
 class Klass {
 private:
@@ -82,6 +83,14 @@ public:
     virtual HiObject *allocate_instance(HiObject* callable, ArrayList<HiObject *> *args);
 
     void* operator new(size_t size);
+
+    // gc interfaces
+    // this is for objects of this type.
+    virtual void oops_do(OopClosure* closure, HiObject* obj);
+    // for klass itself only.
+    virtual void oops_do(OopClosure* closure);
+
+    virtual size_t size();
 };
 
 #endif //PYTHONVM_KLASS_HPP

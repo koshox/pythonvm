@@ -192,3 +192,12 @@ HiObject *IntegerKlass::allocate_instance(HiObject *callable, ArrayList<HiObject
         return NULL;
     }
 }
+
+size_t IntegerKlass::size() {
+    return sizeof(HiInteger);
+}
+
+void IntegerKlass::oops_do(OopClosure *f, HiObject *obj) {
+    // do nothing
+    // only overwrite warning message in Klass
+}

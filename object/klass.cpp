@@ -13,6 +13,7 @@
 #include "object/hiDict.hpp"
 #include "object/hiList.hpp"
 #include "memory/heap.hpp"
+#include "memory/oopClosure.hpp"
 
 #define ST(x) StringTable::get_instance()->STR(x)
 #define STR(x) x##_str
@@ -242,4 +243,23 @@ void Klass::order_supers() {
 
 void *Klass::operator new(size_t size) {
     return Universe::heap->allocate_meta(size);
+}
+
+size_t Klass::size() {
+    return sizeof(HiObject);
+}
+
+// this function will visit all children
+void Klass::oops_do(OopClosure *closure, HiObject *obj) {
+    printf("warning: klass oops_do for ");
+    _name->print();
+    printf("\n");
+}
+
+void Klass::oops_do(OopClosure *closure) {
+    closure->do_oop((HiObject**)&_super);
+    closure->do_oop((HiObject**)&_mro);
+    closure->do_oop((HiObject**)&_name);
+    closure->do_oop((HiObject**)&_klass_dict);
+    closure->do_oop((HiObject**)&_type_object);
 }

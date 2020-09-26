@@ -12,6 +12,7 @@ class Heap;
 class HiInteger;
 class HiObject;
 class CodeObject;
+class OopClosure;
 
 template <typename T>
 class ArrayList;
@@ -25,6 +26,8 @@ public:
 
     static ArrayList<Klass*>* klasses;
 
+    static CodeObject *main_code;
+
     static Heap *heap;
 
 public:
@@ -32,6 +35,7 @@ public:
 
     static void destory();
 
+    static void oops_do(OopClosure* closure);
 };
 
 #endif //PYTHONVM_UNIVERSE_HPP

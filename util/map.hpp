@@ -7,6 +7,8 @@
 
 #include <stdio.h>
 
+class OopClosure;
+
 template<typename K, typename V>
 class MapEntry {
 public:
@@ -53,6 +55,8 @@ public:
     MapEntry<K, V> *entries() { return _entries; }
 
     void *operator new(size_t size);
+
+    void oops_do(OopClosure *closure);
 };
 
 #endif //PYTHONVM_MAP_HPP

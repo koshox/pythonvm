@@ -33,6 +33,10 @@ public:
     virtual HiObject *len(HiObject *x);
 
     virtual HiObject *allocate_instance(HiObject *callable, ArrayList<HiObject *> *args);
+
+    virtual size_t size();
+
+    virtual void oops_do(OopClosure *closure, HiObject *obj);
 };
 
 class HiString : public HiObject {
@@ -51,6 +55,10 @@ public:
 
     const char *value() {
         return _value;
+    }
+
+    char **value_address() {
+        return &_value;
     }
 
     int length() {

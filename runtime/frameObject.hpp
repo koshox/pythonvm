@@ -5,6 +5,7 @@
 #ifndef PYTHONVM_FRAMEOBJECT_HPP
 #define PYTHONVM_FRAMEOBJECT_HPP
 
+#include <memory/oopClosure.hpp>
 #include "object/hiList.hpp"
 #include "code/codeObject.hpp"
 #include "util/map.hpp"
@@ -99,6 +100,8 @@ public:
     unsigned char get_op_code();
 
     int get_op_arg();
+
+    void oops_do(OopClosure *f);
 };
 
 #endif //PYTHONVM_FRAMEOBJECT_HPP

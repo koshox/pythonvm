@@ -6,7 +6,7 @@
 #include "util/map.hpp"
 #include "object/hiInteger.hpp"
 #include "interpreter.hpp"
-#include "../code/bytecode.hpp"
+#include "code/bytecode.hpp"
 #include "universe.hpp"
 #include "functionObject.hpp"
 #include "stringTable.hpp"
@@ -15,8 +15,9 @@
 #include "object/hiInteger.hpp"
 #include "object/hiList.hpp"
 #include "object/hiDict.hpp"
+#include "memory/oopClosure.hpp"
 
-#define PUSH(x)       _frame->stack()->append((x))
+#define PUSH(x)       _frame->stack()->append(x)
 #define POP()         _frame->stack()->pop()
 #define TOP()         _frame->stack()->top()
 #define STACK_LEVEL() _frame->stack()->size()
@@ -71,6 +72,7 @@ void Interpreter::eval_frame() {
 
     HiObject *lhs, *rhs;
     HiObject *v, *w, *u, *attr;
+    HiList *stack;
 
     unsigned char op_code;
     bool has_arg;
@@ -127,14 +129,22 @@ void Interpreter::eval_frame() {
             case ByteCode::INPLACE_MODULO:
                 v = POP();
                 w = POP();
-                PUSH(w->mod(v));
+                // TODO
+                // PUSH(w->mod(v));
+                u = w->mod(v);
+                stack = _frame->stack();
+                stack->append(u);
                 break;
 
             case ByteCode::BINARY_ADD:
             case ByteCode::INPLACE_ADD:
                 v = POP();
                 w = POP();
-                PUSH(w->add(v));
+                // PUSH(w->add(v));
+                // _frame->stack()->append(w->add(v));
+                stack = _frame->stack();
+                u = w->add(v);
+                stack->append(u);
                 break;
 
             case ByteCode::BINARY_SUBSCR:
@@ -581,4 +591,13 @@ HiObject *Interpreter::call_virtual(HiObject *func, ObjList args) {
 void Interpreter::enter_frame(FrameObject *frame) {
     frame->set_sender(_frame);
     _frame = frame;
+}
+
+void Interpreter::oops_do(OopClosure *f) {
+    f->do_oop((HiObject **) &_builtins);
+    f->do_oop((HiObject **) &_ret_value);
+
+    if (_frame) {
+        _frame->oops_do(f);
+    }
 }

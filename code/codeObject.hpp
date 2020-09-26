@@ -5,9 +5,26 @@
 #ifndef PYTHONVM_CODEOBJECT_HPP
 #define PYTHONVM_CODEOBJECT_HPP
 
-#include "../object/hiObject.hpp"
-#include "../object/hiString.hpp"
-#include "../util/arrayList.hpp"
+#include "object/hiObject.hpp"
+
+class HiString;
+
+template<typename T>
+class ArrayList;
+
+class CodeKlass : public Klass {
+private:
+    CodeKlass();
+
+    static CodeKlass *instance;
+
+public:
+    static CodeKlass *get_instance();
+
+    virtual void oops_do(OopClosure *closure, HiObject *obj);
+
+    virtual size_t size();
+};
 
 class CodeObject : public HiObject {
 public:

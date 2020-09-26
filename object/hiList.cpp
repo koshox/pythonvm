@@ -9,6 +9,7 @@
 #include "runtime/interpreter.hpp"
 #include "runtime/universe.hpp"
 #include "runtime/functionObject.hpp"
+#include "memory/oopClosure.hpp"
 
 ListKlass *ListKlass::instance = NULL;
 
@@ -337,4 +338,14 @@ HiObject *listiterator_next(ObjList args) {
         // TODO : we need Traceback here to mark iteration end
         return NULL;
     }
+}
+
+size_t ListKlass::size() {
+    return sizeof(HiList);
+}
+
+void ListKlass::oops_do(OopClosure *f, HiObject *obj) {
+    assert(obj && obj->klass() == (Klass*) this);
+
+    f->do_array_list(&((HiList*)obj)->_inner_list);
 }

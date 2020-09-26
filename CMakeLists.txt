@@ -4,7 +4,6 @@ project(pythonvm)
 SET(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -g -ggdb")
 SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall")
 
-# add_executable(pythonvm main.cpp util/bufferedInputStream.hpp util/arrayList.hpp util/arrayList.cpp object/hiObject.hpp object/hiString.hpp object/hiString.cpp object/hiInteger.hpp code/codeObject.hpp code/codeObject.cpp code/binaryFileParser.hpp code/binaryFileParser.cpp)
 ADD_EXECUTABLE(pythonvm main.cpp
         object/hiInteger.cpp
         #object/hiDouble.cpp
@@ -26,7 +25,7 @@ ADD_EXECUTABLE(pythonvm main.cpp
         #runtime/generator.cpp
         runtime/cellObject.cpp
         memory/heap.cpp
-        #memory/oopClosure.cpp
+        memory/oopClosure.cpp
         code/binaryFileParser.cpp
         code/codeObject.cpp)
 

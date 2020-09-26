@@ -19,6 +19,9 @@ public:
     static FunctionKlass *get_instance();
 
     virtual void print(HiObject *obj);
+
+    virtual size_t size();
+    virtual void oops_do(OopClosure *f, HiObject *obj);
 };
 
 typedef HiObject *(*NativeFuncPointer)(ObjList args);
@@ -83,6 +86,8 @@ private:
 
 public:
     static NativeFunctionKlass *get_instance();
+    virtual size_t size();
+    virtual void oops_do(OopClosure *f, HiObject *obj);
 };
 
 class MethodKlass : public Klass {
@@ -92,6 +97,8 @@ private:
 
 public:
     static MethodKlass* get_instance();
+    virtual size_t size();
+    virtual void oops_do(OopClosure *f, HiObject *obj);
 };
 
 class MethodObject : public HiObject {

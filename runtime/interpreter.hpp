@@ -5,8 +5,14 @@
 #ifndef PYTHONVM_INTERPRETER_HPP
 #define PYTHONVM_INTERPRETER_HPP
 
+#include "code/bytecode.hpp"
 #include "code/codeObject.hpp"
-#include "frameObject.hpp"
+
+class FrameObject;
+
+class HiDict;
+
+class OopClosure;
 
 class Interpreter {
 private:
@@ -34,6 +40,8 @@ public:
     void leave_frame();
 
     HiObject *call_virtual(HiObject *func, ObjList args);
+
+    void oops_do(OopClosure *f);
 };
 
 #endif //PYTHONVM_INTERPRETER_HPP

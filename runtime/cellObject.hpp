@@ -18,6 +18,7 @@ public:
     static CellKlass *get_instance();
 
     virtual size_t size();
+    virtual void oops_do(OopClosure *f, HiObject *obj);
 };
 
 // 这种方式STORE_DEREF修改后仍然可见

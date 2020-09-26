@@ -6,6 +6,7 @@
 #include "object/hiList.hpp"
 #include "object/hiDict.hpp"
 #include "object/hiString.hpp"
+#include "memory/oopClosure.hpp"
 
 CellKlass *CellKlass::_instance = NULL;
 
@@ -34,4 +35,9 @@ HiObject *CellObject::value() {
 
 size_t CellKlass::size() {
     return sizeof(CellKlass);
+}
+
+void CellKlass::oops_do(OopClosure *f, HiObject *obj) {
+    CellObject *co = (CellObject *) obj;
+    f->do_oop((HiObject **) &co->_table);
 }

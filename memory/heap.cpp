@@ -2,9 +2,11 @@
 // Created by Kosho on 2020/9/13.
 //
 #include <stdlib.h>
+#include <runtime/interpreter.hpp>
 
 #include "runtime/universe.hpp"
 #include "memory/heap.hpp"
+#include "memory/oopClosure.hpp"
 
 Space::Space(size_t size) {
     _size = size;
@@ -109,7 +111,9 @@ void *Heap::allocate_meta(size_t size) {
 }
 
 void Heap::copy_live_objects() {
-    // TODO
+    ScavengeOopClosure* closure = new ScavengeOopClosure(eden, survivor, metaspace);
+    closure->scavenge();
+    delete closure;
 }
 
 void Heap::gc() {
