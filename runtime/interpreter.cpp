@@ -16,6 +16,7 @@
 #include "object/hiList.hpp"
 #include "object/hiDict.hpp"
 #include "memory/oopClosure.hpp"
+#include "runtime/module.hpp"
 
 #define PUSH(x)       _frame->stack()->append(x)
 #define POP()         _frame->stack()->pop()
@@ -58,11 +59,28 @@ Interpreter::Interpreter() {
     _builtins->put(new HiString("dict"), DictKlass::get_instance()->type_object());
 }
 
+void Interpreter::initialize() {
+    _modules = new HiDict();
+    _modules->put(new HiString("__builtins__"), _builtins);
+}
+
 void Interpreter::run(CodeObject *codes) {
     _frame = new FrameObject(codes);
 
     eval_frame();
     destroy_frame();
+}
+
+HiDict *Interpreter::run_mod(CodeObject *codes, HiString *mod_name) {
+    FrameObject *frame = new FrameObject(codes);
+    frame->set_entry_frame(true);
+    frame->locals()->put(ST(name), mod_name);
+
+    enter_frame(frame);
+    eval_frame();
+    HiDict *result = frame->locals();
+    destroy_frame();
+    return result;
 }
 
 void Interpreter::eval_frame() {
@@ -147,10 +165,23 @@ void Interpreter::eval_frame() {
                 stack->append(u);
                 break;
 
+            case ByteCode::BINARY_SUBTRACT:
+                v = POP();
+                w = POP();
+                PUSH(w->sub(v));
+                break;
+
             case ByteCode::BINARY_SUBSCR:
                 v = POP();
                 w = POP();
                 PUSH(w->subscr(v));
+                break;
+
+            case ByteCode::STORE_MAP:
+                w = POP();
+                u = POP();
+                v = TOP();
+                ((HiDict *) v)->put(w, u);
                 break;
 
             case ByteCode::STORE_SUBSCR:
@@ -173,7 +204,7 @@ void Interpreter::eval_frame() {
 
             case ByteCode::FOR_ITER:
                 v = TOP();
-                w = v->get_attr(StringTable::get_instance()->next_str);
+                w = v->getattr(StringTable::get_instance()->next_str);
                 // TODO
                 build_frame(w, NULL, 0);
 
@@ -238,7 +269,7 @@ void Interpreter::eval_frame() {
                 u = POP();
                 v = _frame->names()->get(op_arg);
                 w = POP();
-                u->set_attr(v, w);
+                u->setattr(v, w);
                 break;
 
             case ByteCode::DUP_TOPX:
@@ -291,17 +322,10 @@ void Interpreter::eval_frame() {
                 PUSH(v);
                 break;
 
-            case ByteCode::STORE_MAP:
-                w = POP();
-                u = POP();
-                v = TOP();
-                ((HiDict *) v)->put(w, u);
-                break;
-
             case ByteCode::LOAD_ATTR:
                 v = POP();
                 w = _frame->_names->get(op_arg);
-                PUSH(v->get_attr(w));
+                PUSH(v->getattr(w));
                 break;
 
             case ByteCode::COMPARE_OP:
@@ -355,6 +379,21 @@ void Interpreter::eval_frame() {
                     default:
                         printf("Error: Unrecognized compare op %d\n", op_arg);
                 }
+                break;
+
+            case ByteCode::IMPORT_NAME:
+                POP();
+                POP();
+                v = _frame->names()->get(op_arg);
+                w = _modules->get(v);
+                if (w != Universe::HiNone) {
+                    PUSH(w);
+                    break;
+                }
+
+                w = ModuleObject::import_module(v);
+                _modules->put(v, w);
+                PUSH(w);
                 break;
 
             case ByteCode::POP_JUMP_IF_FALSE:
@@ -552,7 +591,7 @@ void Interpreter::build_frame(HiObject *callable, ObjList args, int op_arg) {
         PUSH(instance);
     } else {
         // __call__
-        HiObject *m = callable->get_attr(ST(call));
+        HiObject *m = callable->getattr(ST(call));
         if (m != Universe::HiNone) {
             build_frame(m, args, op_arg);
         } else {
@@ -595,6 +634,7 @@ void Interpreter::enter_frame(FrameObject *frame) {
 
 void Interpreter::oops_do(OopClosure *f) {
     f->do_oop((HiObject **) &_builtins);
+    f->do_oop((HiObject **) &_modules);
     f->do_oop((HiObject **) &_ret_value);
 
     if (_frame) {

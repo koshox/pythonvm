@@ -81,6 +81,7 @@ public:
     virtual HiObject *iter     (HiObject* x) { return 0; }
 
     virtual HiObject *allocate_instance(HiObject* callable, ArrayList<HiObject *> *args);
+    virtual HiObject *get_klass_attr(HiObject *x, HiObject *y);
 
     void* operator new(size_t size);
 

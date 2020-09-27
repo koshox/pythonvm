@@ -67,7 +67,7 @@ HiObject *Klass::create_klass(HiObject *x, HiObject *supers, HiObject *name) {
 HiObject *Klass::allocate_instance(HiObject *callable, ArrayList<HiObject *> *args) {
     HiObject *instance = new HiObject();
     instance->set_klass(((HiTypeObject *) callable)->own_klass());
-    HiObject *constructor = instance->get_attr(StringTable::get_instance()->init_str);
+    HiObject *constructor = instance->getattr(StringTable::get_instance()->init_str);
     if (constructor != Universe::HiNone) {
         Interpreter::get_instance()->call_virtual(constructor, args);
     }
@@ -76,7 +76,7 @@ HiObject *Klass::allocate_instance(HiObject *callable, ArrayList<HiObject *> *ar
 }
 
 HiObject *Klass::find_and_call(HiObject *lhs, ObjList args, HiObject *func_name) {
-    HiObject *func = lhs->get_attr(func_name);
+    HiObject *func = lhs->getattr(func_name);
     if (func != Universe::HiNone) {
         return Interpreter::get_instance()->call_virtual(func, args);
     }
@@ -152,12 +152,7 @@ HiObject *Klass::getattr(HiObject *x, HiObject *y) {
         }
     }
 
-    result = find_in_parents(x, y);
-    if (MethodObject::is_function(result)) {
-        result = new MethodObject((FunctionObject *) result, x);
-    }
-
-    return result;
+    return get_klass_attr(x, y);
 }
 
 HiObject *Klass::setattr(HiObject *x, HiObject *y, HiObject *z) {
@@ -176,6 +171,17 @@ HiObject *Klass::setattr(HiObject *x, HiObject *y, HiObject *z) {
 
     x->obj_dict()->put(y, z);
     return Universe::HiNone;
+}
+
+HiObject* Klass::get_klass_attr(HiObject* x, HiObject* y) {
+    HiObject* result = Universe::HiNone;
+
+    result = find_in_parents(x, y);
+    if (MethodObject::is_function(result)) {
+        result = new MethodObject((FunctionObject*)result, x);
+    }
+
+    return result;
 }
 
 void Klass::add_super(Klass *klass) {

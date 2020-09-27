@@ -17,6 +17,7 @@ class OopClosure;
 class Interpreter {
 private:
     HiDict *_builtins;
+    HiDict *_modules;
     FrameObject *_frame;
     HiObject *_ret_value;
 
@@ -27,7 +28,11 @@ private:
 public:
     static Interpreter *get_instance();
 
+    void initialize();
+
     void run(CodeObject *codes);
+
+    HiDict *run_mod(CodeObject *codes, HiString *mod_name);
 
     void build_frame(HiObject *pObject, ObjList args, int op_arg);
 

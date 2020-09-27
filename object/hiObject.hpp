@@ -48,8 +48,8 @@ public:
     HiObject *ge(HiObject *x);
     HiObject *le(HiObject *x);
 
-    HiObject *get_attr(HiObject *x);
-    HiObject *set_attr(HiObject *x, HiObject *y);
+    HiObject *getattr(HiObject *x);
+    HiObject *setattr(HiObject *x, HiObject *y);
 
     HiObject *subscr(HiObject *x);
     HiObject *contains(HiObject *x);

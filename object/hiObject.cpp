@@ -72,11 +72,11 @@ HiObject *HiObject::le(HiObject *rhs) {
     return klass()->le(this, rhs);
 }
 
-HiObject *HiObject::get_attr(HiObject *x) {
+HiObject *HiObject::getattr(HiObject *x) {
     return klass()->getattr(this, x);
 }
 
-HiObject *HiObject::set_attr(HiObject *x, HiObject *y) {
+HiObject *HiObject::setattr(HiObject *x, HiObject *y) {
     return klass()->setattr(this, x, y);
 }
 
