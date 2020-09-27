@@ -396,6 +396,13 @@ void Interpreter::eval_frame() {
                 PUSH(w);
                 break;
 
+            case ByteCode::IMPORT_FROM:
+                v = _frame->names()->get(op_arg);
+                w = TOP();
+                u = ((ModuleObject*)w)->get(v);
+                PUSH(u);
+                break;
+
             case ByteCode::POP_JUMP_IF_FALSE:
                 v = POP();
                 if (v == Universe::HiFalse)

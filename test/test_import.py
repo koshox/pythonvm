@@ -1,3 +1,4 @@
-import test_func
+# import test_func
+from test_func import fact
 
-print test_func.fact(5)
+print fact(5)

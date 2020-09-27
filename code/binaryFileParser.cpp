@@ -9,6 +9,7 @@
 #include "util/bufferedInputStream.hpp"
 #include "object/hiInteger.hpp"
 #include "binaryFileParser.hpp"
+#include "object/hiList.hpp"
 
 BinaryFileParser::BinaryFileParser(BufferedInputStream *stream) {
     file_stream = stream;
@@ -188,6 +189,11 @@ ArrayList<HiObject *> *BinaryFileParser::get_tuple() {
             case 'R':
                 list->add(_string_table.get(file_stream->read_int()));
                 break;
+            case '(':
+                list->add(new HiList(get_tuple()));
+                break;
+            default:
+                printf("parser, unrecognized type : %c\n", obj_type);
         }
     }
 

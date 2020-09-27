@@ -74,17 +74,18 @@ ModuleObject *ModuleObject::import_module(HiObject *x) {
 }
 
 ModuleObject *ModuleObject::import_so(HiString *mod_name) {
+    // TODO
     return nullptr;
 }
 
 void ModuleObject::put(HiObject *x, HiObject *y) {
-
+    obj_dict()->put(x, y);
 }
 
 HiObject *ModuleObject::get(HiObject *x) {
-    return nullptr;
+    return obj_dict()->get(x);
 }
 
 void ModuleObject::extend(ModuleObject *mo) {
-
+    // TODO
 }
