@@ -12,18 +12,24 @@
 class BufferedInputStream {
 private:
     FILE *fp;
+    const char *file_path;
     char szBuffer[BUFFER_LEN];
     unsigned short index;
 
 public:
-    BufferedInputStream(char const *filename) {
-        fp = fopen(filename, "rb");
+    BufferedInputStream(char const *file_path) {
+        fp = fopen(file_path, "rb");
+        this->file_path = file_path;
         fread(szBuffer, BUFFER_LEN * sizeof(char), 1, fp);
         index = 0;
     }
 
     ~BufferedInputStream() {
         close();
+    }
+
+    const char *get_file_path() {
+        return file_path;
     }
 
     char read() {

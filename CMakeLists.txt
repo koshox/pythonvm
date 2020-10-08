@@ -29,16 +29,16 @@ ADD_EXECUTABLE(pythonvm main.cpp
         code/binaryFileParser.cpp
         code/codeObject.cpp)
 
-# ADD_LIBRARY(math SHARED
-#         extlib/math.cpp)
+ADD_LIBRARY(math SHARED
+        extlib/math.cpp)
 
-# ADD_CUSTOM_COMMAND(TARGET math
-#         POST_BUILD
-#         COMMAND mkdir -p lib
-#         COMMAND cp libmath.so lib/
-#         COMMAND cp ../lib/*.py lib/
-#         COMMAND python -m compileall lib/*.py
-#         )
+ADD_CUSTOM_COMMAND(TARGET pythonvm
+        POST_BUILD
+        COMMAND mkdir -p lib
+        # COMMAND cp libmath.so lib/
+        COMMAND cp ../lib/*.py lib/
+        COMMAND python -m compileall lib/*.py
+        )
 
 INCLUDE_DIRECTORIES(./)
-# TARGET_LINK_LIBRARIES(pythonvm ${CMAKE_DL_LIBS})
+TARGET_LINK_LIBRARIES(pythonvm ${CMAKE_DL_LIBS})

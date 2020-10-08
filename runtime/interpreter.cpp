@@ -43,7 +43,8 @@ Interpreter *Interpreter::get_instance() {
 Interpreter::Interpreter() {
     _frame = NULL;
 
-    _builtins = new HiDict();
+    // prepare for import builtin, this should be created first
+    _builtins = new ModuleObject(new HiDict());
     _builtins->put(new HiString("True"), Universe::HiTrue);
     _builtins->put(new HiString("False"), Universe::HiFalse);
     _builtins->put(new HiString("None"), Universe::HiNone);
@@ -60,6 +61,9 @@ Interpreter::Interpreter() {
 }
 
 void Interpreter::initialize() {
+    // TODO
+    // _builtins->extend(ModuleObject::import_module(new HiString("builtin")));
+
     _modules = new HiDict();
     _modules->put(new HiString("__builtins__"), _builtins);
 }
@@ -391,7 +395,14 @@ void Interpreter::eval_frame() {
                     break;
                 }
 
-                w = ModuleObject::import_module(v);
+                HiString *cur_code_path;
+                if(_frame->_codes->_file_path != NULL) {
+                    cur_code_path = _frame->_codes->_file_path;
+                } else {
+                    cur_code_path = Universe::main_code->_file_path;
+                }
+
+                w = ModuleObject::import_module(cur_code_path, v);
                 _modules->put(v, w);
                 PUSH(w);
                 break;

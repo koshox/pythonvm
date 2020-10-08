@@ -7,6 +7,7 @@
 
 #include "code/bytecode.hpp"
 #include "code/codeObject.hpp"
+#include "module.hpp"
 
 class FrameObject;
 
@@ -16,7 +17,7 @@ class OopClosure;
 
 class Interpreter {
 private:
-    HiDict *_builtins;
+    ModuleObject *_builtins;
     HiDict *_modules;
     FrameObject *_frame;
     HiObject *_ret_value;

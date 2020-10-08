@@ -155,6 +155,12 @@ HiDict::HiDict(Map<HiObject *, HiObject *> *x) {
     set_klass(DictKlass::get_instance());
 }
 
+void HiDict::update(HiDict *dict) {
+    for (int i = 0; i < dict->size(); i++) {
+        put(dict->map()->get_key(i), dict->map()->get_value(i));
+    }
+}
+
 HiObject *dict_set_default(ObjList args) {
     HiDict *dict = (HiDict *) (args->get(0));
     HiObject *key = args->get(1);

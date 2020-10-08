@@ -44,6 +44,8 @@ public:
     bool      has_key(HiObject* k)     { return _map->has_key(k); }
     int       size()                   { return _map->size(); }
     HiObject* remove(HiObject* k)      { return _map->remove(k); }
+
+    void update(HiDict *x);
 };
 
 HiObject* dict_set_default(ObjList args);

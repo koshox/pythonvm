@@ -47,11 +47,13 @@ public:
     int _lineno;
     HiString *_notable;
 
+    HiString *_file_path;
+
     CodeObject(int argcount, int nlocals, int stacksize, int flag, HiString *bytecodes,
                ArrayList<HiObject *> *consts, ArrayList<HiObject *> *names,
                ArrayList<HiObject *> *varnames,
                ArrayList<HiObject *> *freevars, ArrayList<HiObject *> *cellvars,
-               HiString *file_name, HiString *co_name, int lineno, HiString *notable);
+               HiString *file_name, HiString *co_name, int lineno, HiString *notable, HiString *file_path);
 };
 
 #endif //PYTHONVM_CODEOBJECT_HPP

@@ -53,9 +53,11 @@ CodeObject *BinaryFileParser::get_code_object() {
     int begin_line_no = file_stream->read_int();
     HiString *lnotab = get_no_table();
 
+    HiString *file_path = new HiString(file_stream->get_file_path());
+
     return new CodeObject(argcount, nlocals, stacksize, flags, byte_codes,
                           consts, names, var_names, free_vars, cell_vars, file_name, module_name,
-                          begin_line_no, lnotab);
+                          begin_line_no, lnotab, file_path);
 }
 
 

@@ -36,7 +36,7 @@ private:
 public:
     ModuleObject(HiDict *x);
 
-    static ModuleObject *import_module(HiObject *mod_name);
+    static ModuleObject *import_module(HiString *cur_path, HiObject *mod_name);
 
     static ModuleObject *import_so(HiString *mod_name);
 

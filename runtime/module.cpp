@@ -53,13 +53,16 @@ ModuleObject::ModuleObject(HiDict *x) {
     set_klass(ModuleKlass::get_instance());
 }
 
-ModuleObject *ModuleObject::import_module(HiObject *x) {
+ModuleObject *ModuleObject::import_module(HiString *cur_path, HiObject *x) {
     HiString *mod_name = (HiString *) x;
     HiString *file_name = (HiString *) (mod_name->add(ST(pyc_suf)));
 
-    // TODO path
+    HiList* path_list = new HiList();
+    path_list->append(cur_path);
+
+        // TODO path
     std::stringstream ss;
-    ss << "F:\\myproject\\cpp\\pythonvm\\test\\" <<  file_name->value();
+    ss << "D:\\code\\mine\\cpp\\pythonvm\\test\\" <<  file_name->value();
     const char *file_path = ss.str().c_str();
     if (access(file_path, R_OK) == -1) {
         return NULL;
@@ -87,5 +90,5 @@ HiObject *ModuleObject::get(HiObject *x) {
 }
 
 void ModuleObject::extend(ModuleObject *mo) {
-    // TODO
+    obj_dict()->update(mo->obj_dict());
 }

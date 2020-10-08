@@ -68,6 +68,8 @@ public:
     void set(int i, char x) {
         _value[i] = x;
     }
+
+    HiString *join(HiObject *iterable);
 };
 
 HiObject *string_upper(ObjList args);

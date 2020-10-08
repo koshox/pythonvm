@@ -47,7 +47,7 @@ size_t CodeKlass::size() {
 CodeObject::CodeObject(int argcount, int nlocals, int stacksize, int flag, HiString *bytecodes,
                        ArrayList<HiObject *> *consts, ArrayList<HiObject *> *names, ArrayList<HiObject *> *varnames,
                        ArrayList<HiObject *> *freevars, ArrayList<HiObject *> *cellvars,
-                       HiString *file_name, HiString *co_name, int lineno, HiString *notable) :
+                       HiString *file_name, HiString *co_name, int lineno, HiString *notable, HiString *file_path) :
         _argcount(argcount),
         _nlocals(nlocals),
         _stack_size(stacksize),
@@ -61,6 +61,7 @@ CodeObject::CodeObject(int argcount, int nlocals, int stacksize, int flag, HiStr
         _co_name(co_name),
         _file_name(file_name),
         _lineno(lineno),
-        _notable(notable) {
+        _notable(notable),
+        _file_path(file_path){
     set_klass(CodeKlass::get_instance());
 }

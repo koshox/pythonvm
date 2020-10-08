@@ -203,3 +203,39 @@ void StringKlass::oops_do(OopClosure *closure, HiObject *obj) {
 
     closure->do_raw_mem(str_obj->value_address(), str_obj->length());
 }
+
+
+HiString *HiString::join(HiObject *iterable) {
+    int total = 0;
+
+    HiObject *iter = iterable->iter();
+    HiObject *str = iter->next();
+
+    if (str == NULL)
+        return new HiString("");
+
+    total += ((HiString *) str)->length();
+    while ((str = iter->next()) != NULL) {
+        total += _length;
+        total += ((HiString *) str)->length();
+    }
+
+    HiString *sz = new HiString(total);
+    total = 0;
+
+    iter = iterable->iter();
+    str = iter->next();
+    HiString *sobj = (HiString *) str;
+
+    memcpy(sz->_value, sobj->_value, sobj->length());
+    total += ((HiString *) str)->length();
+    while ((str = iter->next()) != NULL) {
+        HiString *sobj = (HiString *) str;
+        memcpy(sz->_value + total, _value, _length);
+        total += _length;
+        memcpy(sz->_value + total, sobj->_value, sobj->length());
+        total += sobj->_length;
+    }
+
+    return sz;
+}
