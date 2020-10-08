@@ -61,8 +61,7 @@ Interpreter::Interpreter() {
 }
 
 void Interpreter::initialize() {
-    // TODO
-    // _builtins->extend(ModuleObject::import_module(new HiString("builtin")));
+    _builtins->extend(ModuleObject::import_module((HiString *) Universe::HiNone, new HiString("builtin")));
 
     _modules = new HiDict();
     _modules->put(new HiString("__builtins__"), _builtins);
@@ -396,7 +395,7 @@ void Interpreter::eval_frame() {
                 }
 
                 HiString *cur_code_path;
-                if(_frame->_codes->_file_path != NULL) {
+                if (_frame->_codes->_file_path != NULL) {
                     cur_code_path = _frame->_codes->_file_path;
                 } else {
                     cur_code_path = Universe::main_code->_file_path;
@@ -410,7 +409,7 @@ void Interpreter::eval_frame() {
             case ByteCode::IMPORT_FROM:
                 v = _frame->names()->get(op_arg);
                 w = TOP();
-                u = ((ModuleObject*)w)->get(v);
+                u = ((ModuleObject *) w)->get(v);
                 PUSH(u);
                 break;
 
@@ -486,6 +485,7 @@ void Interpreter::eval_frame() {
                         args->set(op_arg, POP());
                     }
                 }
+
                 fo->set_default(args);
 
                 if (args != NULL) {
@@ -625,7 +625,10 @@ void Interpreter::leave_frame() {
 }
 
 HiObject *Interpreter::call_virtual(HiObject *func, ObjList args) {
-    if (func->klass() == MethodKlass::get_instance()) {
+    if (func->klass() == NativeFunctionKlass::get_instance()) {
+        // we do not create a virtual frame, but native frame.
+        return ((FunctionObject *) func)->call(args);
+    } else if (func->klass() == MethodKlass::get_instance()) {
         MethodObject *method = (MethodObject *) func;
         if (!args) {
             args = new ArrayList<HiObject *>(1);

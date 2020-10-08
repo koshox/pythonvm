@@ -15,7 +15,8 @@ int main(int argc, char **argv) {
     BufferedInputStream stream(argv[1]);
     BinaryFileParser parser(&stream);
     Universe::main_code = parser.parse();
-    Universe::heap->gc();
+    // TODO Function default GC有问题
+    // Universe::heap->gc();
 
     Interpreter::get_instance()->run(Universe::main_code);
 

@@ -57,19 +57,28 @@ ModuleObject *ModuleObject::import_module(HiString *cur_path, HiObject *x) {
     HiString *mod_name = (HiString *) x;
     HiString *file_name = (HiString *) (mod_name->add(ST(pyc_suf)));
 
-    HiList* path_list = new HiList();
-    path_list->append(cur_path);
+    // 从当前code的路径下查找
+    std::string cur_path_str = cur_path->value();
+    std::string mod_path_str;
+    const size_t last_slash_idx = cur_path_str.rfind('/');
+    if (std::string::npos != last_slash_idx) {
+        mod_path_str = cur_path_str.substr(0, last_slash_idx);
+    }
+    mod_path_str = mod_path_str + "/" + file_name->value();
+    HiString *file_path = new HiString(mod_path_str.c_str());
 
-        // TODO path
-    std::stringstream ss;
-    ss << "D:\\code\\mine\\cpp\\pythonvm\\test\\" <<  file_name->value();
-    const char *file_path = ss.str().c_str();
-    if (access(file_path, R_OK) == -1) {
-        return NULL;
+    if (access(file_path->value(), R_OK) == -1) {
+        // 从/lib下查找
+        HiList *pyc_list = new HiList();
+        pyc_list->append(ST(libdir_pre));
+        pyc_list->append(mod_name);
+        pyc_list->append(ST(pyc_suf));
+        file_path = ST(empty)->join(pyc_list);
     }
 
-    // BufferedInputStream stream(file_name->value());
-    BufferedInputStream stream(file_path);
+    assert(access(file_path->value(), R_OK) == 0);
+
+    BufferedInputStream stream(file_path->value());
     BinaryFileParser parser(&stream);
     CodeObject *mod_code = parser.parse();
     HiDict *mod_dict = Interpreter::get_instance()->run_mod(mod_code, mod_name);

@@ -77,8 +77,8 @@ public:
     virtual HiObject *getattr(HiObject *x, HiObject *y);
     virtual HiObject *setattr(HiObject *x, HiObject *y, HiObject *z);
 
-    virtual HiObject *next     (HiObject* x) { return 0; }
-    virtual HiObject *iter     (HiObject* x) { return 0; }
+    virtual HiObject *next     (HiObject* x);
+    virtual HiObject *iter     (HiObject* x);
 
     virtual HiObject *allocate_instance(HiObject* callable, ArrayList<HiObject *> *args);
     virtual HiObject *get_klass_attr(HiObject *x, HiObject *y);

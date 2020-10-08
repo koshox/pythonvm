@@ -173,12 +173,12 @@ HiObject *Klass::setattr(HiObject *x, HiObject *y, HiObject *z) {
     return Universe::HiNone;
 }
 
-HiObject* Klass::get_klass_attr(HiObject* x, HiObject* y) {
-    HiObject* result = Universe::HiNone;
+HiObject *Klass::get_klass_attr(HiObject *x, HiObject *y) {
+    HiObject *result = Universe::HiNone;
 
     result = find_in_parents(x, y);
     if (MethodObject::is_function(result)) {
-        result = new MethodObject((FunctionObject*)result, x);
+        result = new MethodObject((FunctionObject *) result, x);
     }
 
     return result;
@@ -255,6 +255,14 @@ size_t Klass::size() {
     return sizeof(HiObject);
 }
 
+HiObject *Klass::iter(HiObject *x) {
+    return find_and_call(x, NULL, ST(iter));
+}
+
+HiObject *Klass::next(HiObject *x) {
+    return find_and_call(x, NULL, ST(next));
+}
+
 // this function will visit all children
 void Klass::oops_do(OopClosure *closure, HiObject *obj) {
     printf("warning: klass oops_do for ");
@@ -263,9 +271,9 @@ void Klass::oops_do(OopClosure *closure, HiObject *obj) {
 }
 
 void Klass::oops_do(OopClosure *closure) {
-    closure->do_oop((HiObject**)&_super);
-    closure->do_oop((HiObject**)&_mro);
-    closure->do_oop((HiObject**)&_name);
-    closure->do_oop((HiObject**)&_klass_dict);
-    closure->do_oop((HiObject**)&_type_object);
+    closure->do_oop((HiObject **) &_super);
+    closure->do_oop((HiObject **) &_mro);
+    closure->do_oop((HiObject **) &_name);
+    closure->do_oop((HiObject **) &_klass_dict);
+    closure->do_oop((HiObject **) &_type_object);
 }

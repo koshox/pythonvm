@@ -38,6 +38,7 @@ void CodeKlass::oops_do(OopClosure *f, HiObject *obj) {
     f->do_oop((HiObject **) &co->_co_name);
     f->do_oop((HiObject **) &co->_file_name);
     f->do_oop((HiObject **) &co->_notable);
+    f->do_oop((HiObject **) &co->_file_path);
 }
 
 size_t CodeKlass::size() {
