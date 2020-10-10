@@ -4,8 +4,9 @@
 
 #include <unistd.h>
 #include <string>
-#include <sstream>
+#include <dlfcn.h>
 
+#include "inc/koshox.hpp"
 #include "object/hiDict.hpp"
 #include "object/hiList.hpp"
 #include "runtime/module.hpp"
@@ -55,7 +56,19 @@ ModuleObject::ModuleObject(HiDict *x) {
 
 ModuleObject *ModuleObject::import_module(HiString *cur_path, HiObject *x) {
     HiString *mod_name = (HiString *) x;
-    HiString *file_name = (HiString *) (mod_name->add(ST(pyc_suf)));
+
+    HiList *so_list = new HiList();
+    so_list->append(ST(libdir_pre));
+    so_list->append(mod_name);
+    so_list->append(ST(so_suf));
+    HiString *file_name = ST(empty)->join(so_list);
+
+    // 查找so
+    if (access(file_name->value(), R_OK) == 0) {
+        return import_so(mod_name);
+    }
+
+    file_name = (HiString *) (mod_name->add(ST(pyc_suf)));
 
     // 从当前code的路径下查找
     std::string cur_path_str = cur_path->value();
@@ -86,8 +99,34 @@ ModuleObject *ModuleObject::import_module(HiString *cur_path, HiObject *x) {
 }
 
 ModuleObject *ModuleObject::import_so(HiString *mod_name) {
-    // TODO
-    return nullptr;
+    char *error_msg = NULL;
+
+    HiString *prefix = ST(libdir_pre);
+    HiString *so_suffix = ST(so_suf);
+
+    HiString *file_name = (HiString *) (prefix->add(mod_name)->add(so_suffix));
+    void *handle = dlopen(file_name->value(), RTLD_NOW);
+    if (handle == NULL) {
+        printf("error to open file: %s\n", dlerror());
+        return NULL;
+    }
+
+    HiString *method_prefix = new HiString("init_");
+    HiString *init_meth = (HiString *) (method_prefix->add(mod_name));
+    INIT_FUNC init_func = (INIT_FUNC) dlsym(handle, init_meth->value());
+    if ((error_msg = dlerror()) != NULL) {
+        printf("Symbol init_methods not found: %s\n", error_msg);
+        dlclose(handle);
+        return NULL;
+    }
+
+    RGMethod *methods = init_func();
+    ModuleObject *mod = new ModuleObject(new HiDict());
+    for (; methods->method_name != NULL; methods++) {
+        mod->put(new HiString(methods->method_name), new FunctionObject(methods->method));
+    }
+
+    return mod;
 }
 
 void ModuleObject::put(HiObject *x, HiObject *y) {

@@ -24,7 +24,7 @@ StringTable::StringTable() {
     so_pre_str = new HiString("lib");
     libdir_pre_str = new HiString("./lib/");
     empty_str = new HiString("");
-    so_suf_str = new HiString(".so");
+    so_suf_str = new HiString(".dll");
     pyc_suf_str = new HiString(".pyc");
 }
 

@@ -4,7 +4,11 @@ project(pythonvm)
 SET(CMAKE_CXX_FLAGS_DEBUG "-O0 -Wall -g -ggdb")
 SET(CMAKE_CXX_FLAGS_RELEASE "-O3 -Wall")
 
-ADD_EXECUTABLE(pythonvm main.cpp
+INCLUDE_DIRECTORIES(./)
+
+ADD_EXECUTABLE(pythonvm main.cpp)
+
+set(SOURCE_FILE
         object/hiInteger.cpp
         #object/hiDouble.cpp
         object/hiString.cpp
@@ -29,16 +33,22 @@ ADD_EXECUTABLE(pythonvm main.cpp
         code/binaryFileParser.cpp
         code/codeObject.cpp)
 
-# ADD_LIBRARY(math SHARED
-#         extlib/math.cpp)
+ADD_LIBRARY(pyvm SHARED ${SOURCE_FILE})
 
-ADD_CUSTOM_COMMAND(TARGET pythonvm
+ADD_LIBRARY(math SHARED extlib/math.cpp)
+
+ADD_CUSTOM_COMMAND(TARGET math
         POST_BUILD
         COMMAND mkdir -p lib
-        # COMMAND cp libmath.so lib/
+        COMMAND cp libmath.dll lib/
         COMMAND cp ../lib/*.py lib/
         COMMAND python2 -m compileall lib/*.py
         )
 
-INCLUDE_DIRECTORIES(./)
-TARGET_LINK_LIBRARIES(pythonvm ${CMAKE_DL_LIBS})
+TARGET_LINK_LIBRARIES(pyvm -ldl)
+TARGET_LINK_LIBRARIES(math pyvm)
+
+TARGET_LINK_LIBRARIES(pythonvm pyvm ${CMAKE_DL_LIBS})
+
+set_target_properties(pyvm PROPERTIES PREFIX "lib")
+set_target_properties(math PROPERTIES PREFIX "lib")
