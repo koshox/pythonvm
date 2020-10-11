@@ -43,6 +43,8 @@ Interpreter *Interpreter::get_instance() {
 Interpreter::Interpreter() {
     _frame = NULL;
 
+    _int_status = IS_OK;
+
     // prepare for import builtin, this should be created first
     _builtins = new ModuleObject(new HiDict());
     _builtins->put(new HiString("True"), Universe::HiTrue);
@@ -227,11 +229,7 @@ void Interpreter::eval_frame() {
                 break;
 
             case ByteCode::BREAK_LOOP:
-                b = _frame->_loop_stack->pop();
-                while (STACK_LEVEL() > b->_level) {
-                    POP();
-                }
-                _frame->set_pc(b->_target);
+                _int_status = IS_BREAK;
                 break;
 
             case ByteCode::LOAD_LOCALS:
@@ -242,6 +240,19 @@ void Interpreter::eval_frame() {
                 b = _frame->_loop_stack->pop();
                 while (STACK_LEVEL() > b->_level) {
                     POP();
+                }
+                break;
+
+            case ByteCode::END_FINALLY:
+                // restore state before finally
+                v = POP();
+                if (((long) v) & 0x1) {
+                    _int_status = (Status) (((long) v) >> 1);
+                    if (_int_status == IS_RETURN) {
+                        _ret_value = POP();
+                    } else if (_int_status == IS_CONTINUE) {
+                        _frame->_pc = (int) ((long) POP());
+                    }
                 }
                 break;
 
@@ -444,7 +455,14 @@ void Interpreter::eval_frame() {
                 PUSH(Universe::HiNone);
                 break;
 
+            case ByteCode::CONTINUE_LOOP:
+                _int_status = IS_CONTINUE;
+                _ret_value = (HiObject *) ((long) op_arg);
+                break;
+
             case ByteCode::SETUP_LOOP:
+            case ByteCode::SETUP_EXCEPT:
+            case ByteCode::SETUP_FINALLY:
                 _frame->loop_stack()->add(new Block(
                         op_code, _frame->get_pc() + op_arg,
                         STACK_LEVEL()));
@@ -570,15 +588,54 @@ void Interpreter::eval_frame() {
 
             case ByteCode::RETURN_VALUE:
                 _ret_value = POP();
-                if (_frame->is_first_frame() || _frame->is_entry_frame()) {
-                    return;
-                }
-
-                leave_frame();
+                _int_status = IS_RETURN;
                 break;
 
             default:
                 printf("Error: Unrecognized byte code %d\n", op_code);
+        }
+
+        while (_int_status != IS_OK && _frame->loop_stack()->size() != 0) {
+            b = _frame->_loop_stack->get(_frame->_loop_stack->size() - 1);
+            if (_int_status == IS_CONTINUE && b->_type == ByteCode::SETUP_LOOP) {
+                _frame->_pc = (int) ((long long) _ret_value);
+                _int_status = IS_OK;
+                break;
+            }
+
+            b = _frame->_loop_stack->pop();
+            while (STACK_LEVEL() > b->_level) {
+                POP();
+            }
+
+            if (_int_status == IS_BREAK && b->_type == ByteCode::SETUP_LOOP) {
+                _frame->_pc = b->_target;
+                _int_status = IS_OK;
+            } else if (b->_type == ByteCode::SETUP_FINALLY) {
+                if (_int_status == IS_RETURN || _int_status == IS_CONTINUE) {
+                    PUSH(_ret_value);
+                }
+
+                // 用倒数第一位标记一下是直接整数而不是指针
+                PUSH((HiObject *) (((long) _int_status << 1) | 0x1));
+
+                _frame->_pc = b->_target;
+                _int_status = IS_OK;
+            }
+        }
+
+        // has pending exception and no handler found, unwind stack.
+        if (_int_status != IS_OK && _frame->_loop_stack->size() == 0) {
+            if (_int_status == IS_RETURN) {
+                _int_status = IS_OK;
+            }
+
+            if (_frame->is_first_frame() ||
+                _frame->is_entry_frame()) {
+                return;
+            }
+
+            leave_frame();
         }
     }
 }

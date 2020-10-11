@@ -16,11 +16,21 @@ class HiDict;
 class OopClosure;
 
 class Interpreter {
+    enum Status {
+        IS_OK,
+        IS_BREAK,
+        IS_CONTINUE,
+        IS_EXCEPTION,
+        IS_RETURN,
+        IS_YIELD
+    };
+
 private:
     ModuleObject *_builtins;
     HiDict *_modules;
     FrameObject *_frame;
     HiObject *_ret_value;
+    Status _int_status;
 
     static Interpreter *_instance;
 
