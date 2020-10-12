@@ -51,7 +51,7 @@ void ArrayList<T>::expand() {
     _array = new_array;
 
     _length <<= 1;
-    printf("expand an array to %d, size is %d\n", _length, _size);
+    // printf("expand an array to %d, size is %d\n", _length, _size);
 }
 
 template<typename T>

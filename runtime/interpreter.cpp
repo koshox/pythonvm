@@ -150,6 +150,7 @@ void Interpreter::eval_frame() {
                 break;
 
             case ByteCode::BINARY_MULTIPLY:
+            case ByteCode::INPLACE_MULTIPLY:
                 v = POP();
                 w = POP();
                 PUSH(w->mul(v));
@@ -189,6 +190,7 @@ void Interpreter::eval_frame() {
                 break;
 
             case ByteCode::BINARY_SUBTRACT:
+            case ByteCode::INPLACE_SUBSTRACT:
                 v = POP();
                 w = POP();
                 PUSH(w->sub(v));
@@ -316,6 +318,11 @@ void Interpreter::eval_frame() {
                 v = _frame->names()->get(op_arg);
                 w = POP();
                 u->setattr(v, w);
+                break;
+
+            case ByteCode::STORE_GLOBAL:
+                v = _frame->names()->get(op_arg);
+                _frame->globals()->put(v, POP());
                 break;
 
             case ByteCode::DUP_TOPX:
@@ -481,8 +488,16 @@ void Interpreter::eval_frame() {
 
             case ByteCode::POP_JUMP_IF_FALSE:
                 v = POP();
-                if (v == Universe::HiFalse)
+                if (v == Universe::HiFalse) {
                     _frame->set_pc(op_arg);
+                }
+                break;
+
+            case ByteCode::POP_JUMP_IF_TRUE:
+                v = POP();
+                if (v == Universe::HiTrue) {
+                    _frame->set_pc(op_arg);
+                }
                 break;
 
             case ByteCode::JUMP_FORWARD:
@@ -729,6 +744,12 @@ void Interpreter::eval_frame() {
 }
 
 HiObject *Interpreter::eval_generator(Generator *g) {
+    if (g->frame() == NULL) {
+        // 说明frame已经被销毁了
+        do_raise(Universe::stop_iteration, NULL, NULL);
+        return NULL;
+    }
+
     Handle handle(g);
     enter_frame(g->frame());
     g->_frame->set_entry_frame(true);

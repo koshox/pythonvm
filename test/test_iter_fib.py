@@ -33,6 +33,5 @@ for i in fib:
 while True:
     try:
         print itor.next()
-    # TODO raise ex
     except StopIteration, e:
         break

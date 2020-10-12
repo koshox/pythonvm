@@ -22,6 +22,7 @@ void ListKlass::initialize() {
     klass_dict->put(new HiString("insert"), new FunctionObject(list_insert));
     klass_dict->put(new HiString("index"), new FunctionObject(list_index));
     klass_dict->put(new HiString("pop"), new FunctionObject(list_pop));
+    klass_dict->put(new HiString("popleft"), new FunctionObject(list_popleft));
     klass_dict->put(new HiString("remove"), new FunctionObject(list_remove));
     klass_dict->put(new HiString("reverse"), new FunctionObject(list_reverse));
     klass_dict->put(new HiString("sort"), new FunctionObject(list_sort));
@@ -251,6 +252,14 @@ HiObject *list_pop(ObjList args) {
     return list->pop();
 }
 
+HiObject *list_popleft(ObjList args) {
+    HiList *list = (HiList *) (args->get(0));
+    assert(list && list->klass() == ListKlass::get_instance());
+    HiObject *left = list->get(0);
+    list->delete_index(0);
+    return left;
+}
+
 HiObject *list_remove(ObjList args) {
     HiList *list = (HiList *) (args->get(0));
     HiObject *target = args->get(1);
@@ -345,7 +354,7 @@ size_t ListKlass::size() {
 }
 
 void ListKlass::oops_do(OopClosure *f, HiObject *obj) {
-    assert(obj && obj->klass() == (Klass*) this);
+    assert(obj && obj->klass() == (Klass *) this);
 
-    f->do_array_list(&((HiList*)obj)->_inner_list);
+    f->do_array_list(&((HiList *) obj)->_inner_list);
 }
