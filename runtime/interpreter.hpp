@@ -15,6 +15,8 @@ class HiDict;
 
 class OopClosure;
 
+class Generator;
+
 class Interpreter {
     enum Status {
         IS_OK,
@@ -60,6 +62,8 @@ public:
     void leave_frame();
 
     HiObject *call_virtual(HiObject *func, ObjList args);
+
+    HiObject *eval_generator(Generator *g);
 
     /**
       * 抛出异常

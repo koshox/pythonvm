@@ -2,22 +2,23 @@
 // Created by Kosho on 2020/8/15.
 //
 
-#include "runtime/frameObject.hpp"
-#include "util/map.hpp"
-#include "object/hiInteger.hpp"
-#include "interpreter.hpp"
 #include "code/bytecode.hpp"
-#include "universe.hpp"
-#include "functionObject.hpp"
-#include "stringTable.hpp"
-#include "cellObject.hpp"
+#include "runtime/interpreter.hpp"
+#include "runtime/frameObject.hpp"
+#include "runtime/universe.hpp"
+#include "runtime/functionObject.hpp"
+#include "runtime/stringTable.hpp"
+#include "runtime/cellObject.hpp"
+#include "runtime/module.hpp"
+#include "runtime/generator.hpp"
 #include "object/hiString.hpp"
 #include "object/hiInteger.hpp"
 #include "object/hiList.hpp"
 #include "object/hiDict.hpp"
-#include "memory/oopClosure.hpp"
-#include "runtime/module.hpp"
 #include "traceback.hpp"
+#include "memory/oopClosure.hpp"
+#include "util/map.hpp"
+#include "util/handles.hpp"
 
 #define PUSH(x)       _frame->stack()->append(x)
 #define POP()         _frame->stack()->pop()
@@ -255,6 +256,12 @@ void Interpreter::eval_frame() {
             case ByteCode::LOAD_LOCALS:
                 PUSH(_frame->locals());
                 break;
+
+            case ByteCode::YIELD_VALUE:
+                // we are assured that we're in the progress of evalating generator.
+                _int_status = IS_YIELD;
+                _ret_value = TOP();
+                return;
 
             case ByteCode::POP_BLOCK:
                 b = _frame->_loop_stack->pop();
@@ -721,6 +728,25 @@ void Interpreter::eval_frame() {
     }
 }
 
+HiObject *Interpreter::eval_generator(Generator *g) {
+    Handle handle(g);
+    enter_frame(g->frame());
+    g->_frame->set_entry_frame(true);
+    eval_frame();
+
+    if (_int_status != IS_YIELD) {
+        _int_status = IS_OK;
+        leave_frame();
+        ((Generator *) handle())->set_frame(NULL);
+        return NULL;
+    }
+
+    _int_status = IS_OK;
+    _frame = _frame->sender();
+
+    return _ret_value;
+}
+
 void Interpreter::destroy_frame() {
     FrameObject *temp = _frame;
     _frame = _frame->sender();
@@ -737,6 +763,10 @@ void Interpreter::build_frame(HiObject *callable, ObjList args, int op_arg) {
         }
         args->insert(0, method->owner());
         build_frame(method->func(), args, op_arg + 1);
+    } else if (MethodObject::is_yield_function(callable)) {
+        Generator *generator = new Generator((FunctionObject *) callable, args, op_arg);
+        PUSH(generator);
+        return;
     } else if (callable->klass() == FunctionKlass::get_instance()) {
         FrameObject *frame = new FrameObject((FunctionObject *) callable, args, op_arg);
         frame->set_sender(_frame);

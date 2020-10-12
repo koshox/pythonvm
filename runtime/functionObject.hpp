@@ -122,6 +122,7 @@ public:
     FunctionObject *func() { return _func; }
 
     static bool is_function(HiObject *x);
+    static bool is_yield_function(HiObject *x);
 };
 
 HiObject* len(ObjList args);

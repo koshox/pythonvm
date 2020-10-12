@@ -169,11 +169,21 @@ bool MethodObject::is_function(HiObject *x) {
     return false;
 }
 
+bool MethodObject::is_yield_function(HiObject *x) {
+    Klass *k = x->klass();
+    if (k != (Klass *) FunctionKlass::get_instance()) {
+        return false;
+    }
+
+    FunctionObject *fo = (FunctionObject *) x;
+    return ((fo->flags() & FunctionObject::CO_GENERATOR) != 0);
+}
+
 HiObject *len(ObjList args) {
     return args->get(0)->len();
 }
 
-HiObject* iter(ObjList args) {
+HiObject *iter(ObjList args) {
     return args->get(0)->iter();
 }
 

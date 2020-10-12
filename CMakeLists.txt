@@ -10,7 +10,6 @@ ADD_EXECUTABLE(pythonvm main.cpp)
 
 set(SOURCE_FILE
         object/hiInteger.cpp
-        #object/hiDouble.cpp
         object/hiString.cpp
         object/hiObject.cpp
         object/hiList.cpp
@@ -18,7 +17,7 @@ set(SOURCE_FILE
         object/klass.cpp
         util/arrayList.cpp
         util/map.cpp
-        #util/handles.cpp
+        util/handles.cpp
         runtime/interpreter.cpp
         runtime/universe.cpp
         runtime/frameObject.cpp
@@ -26,7 +25,7 @@ set(SOURCE_FILE
         runtime/stringTable.cpp
         runtime/module.cpp
         runtime/traceback.cpp
-        #runtime/generator.cpp
+        runtime/generator.cpp
         runtime/cellObject.cpp
         memory/heap.cpp
         memory/oopClosure.cpp
