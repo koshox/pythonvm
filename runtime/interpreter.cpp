@@ -17,6 +17,7 @@
 #include "object/hiDict.hpp"
 #include "memory/oopClosure.hpp"
 #include "runtime/module.hpp"
+#include "traceback.hpp"
 
 #define PUSH(x)       _frame->stack()->append(x)
 #define POP()         _frame->stack()->pop()
@@ -253,6 +254,11 @@ void Interpreter::eval_frame() {
                     } else if (_int_status == IS_CONTINUE) {
                         _frame->_pc = (int) ((long) POP());
                     }
+                } else if (v != Universe::HiNone) {
+                    _exception_class = v;
+                    _pending_exception = POP();
+                    _trace_back = POP();
+                    _int_status = IS_EXCEPTION;
                 }
                 break;
 
@@ -390,6 +396,29 @@ void Interpreter::eval_frame() {
                         }
                         break;
 
+                    case ByteCode::EXC_MATCH: {
+                        bool found = false;
+                        Klass *k = ((HiTypeObject *) v)->own_klass();
+                        if (v == w) {
+                            found = true;
+                        } else {
+                            for (int i = 0; i < k->mro()->size(); i++) {
+                                if (v->klass()->mro()->get(i) == w) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (found) {
+                            PUSH(Universe::HiTrue);
+                        } else {
+                            PUSH(Universe::HiFalse);
+                        }
+
+                        break;
+                    }
+
                     default:
                         printf("Error: Unrecognized compare op %d\n", op_arg);
                 }
@@ -474,6 +503,21 @@ void Interpreter::eval_frame() {
 
             case ByteCode::STORE_FAST:
                 _frame->fast_locals()->set(op_arg, POP());
+                break;
+
+            case ByteCode::RAISE_VARARGS:
+                w = v = u = NULL;
+                switch (op_arg) {
+                    case 3:
+                        u = POP();
+                    case 2:
+                        v = POP();
+                    case 1:
+                        w = POP();
+                        break;
+                }
+
+                do_raise(w, v, u);
                 break;
 
             case ByteCode::CALL_FUNCTION:
@@ -611,13 +655,26 @@ void Interpreter::eval_frame() {
             if (_int_status == IS_BREAK && b->_type == ByteCode::SETUP_LOOP) {
                 _frame->_pc = b->_target;
                 _int_status = IS_OK;
-            } else if (b->_type == ByteCode::SETUP_FINALLY) {
-                if (_int_status == IS_RETURN || _int_status == IS_CONTINUE) {
-                    PUSH(_ret_value);
-                }
+            } else if (b->_type == ByteCode::SETUP_FINALLY ||
+                       (_int_status == IS_EXCEPTION
+                        && b->_type == ByteCode::SETUP_EXCEPT)) {
+                if (_int_status == IS_EXCEPTION) {
+                    // traceback, value, exception class
+                    PUSH(_trace_back);
+                    PUSH(_pending_exception);
+                    PUSH(_exception_class);
 
-                // 用倒数第一位标记一下是直接整数而不是指针
-                PUSH((HiObject *) (((long) _int_status << 1) | 0x1));
+                    _trace_back = NULL;
+                    _pending_exception = NULL;
+                    _exception_class = NULL;
+                } else {
+                    if (_int_status == IS_RETURN || _int_status == IS_CONTINUE) {
+                        PUSH(_ret_value);
+                    }
+
+                    // 用倒数第一位标记一下是直接整数而不是指针
+                    PUSH((HiObject *) (((long) _int_status << 1) | 0x1));
+                }
 
                 _frame->_pc = b->_target;
                 _int_status = IS_OK;
@@ -718,4 +775,40 @@ void Interpreter::oops_do(OopClosure *f) {
     if (_frame) {
         _frame->oops_do(f);
     }
+}
+
+/**
+ * 抛出异常
+ *
+ * @param exc 异常类型
+ * @param val 异常实例
+ * @param tb 异常堆栈
+ * @return 状态
+ */
+Interpreter::Status Interpreter::do_raise(HiObject *exc, HiObject *val, HiObject *tb) {
+    assert(exc != NULL);
+
+    _int_status = IS_EXCEPTION;
+
+    if (tb == NULL) {
+        tb = new Traceback();
+    }
+
+    if (val != NULL) {
+        _exception_class = exc;
+        _pending_exception = val;
+        _trace_back = tb;
+        return IS_EXCEPTION;
+    }
+
+    if (exc->klass() == TypeKlass::get_instance()) {
+        _pending_exception = call_virtual(exc, NULL);
+        _exception_class = exc;
+    } else {
+        _pending_exception = exc;
+        _exception_class = _pending_exception->klass()->type_object();
+    }
+
+    _trace_back = tb;
+    return IS_EXCEPTION;
 }

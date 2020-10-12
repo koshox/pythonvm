@@ -30,6 +30,10 @@ private:
     HiDict *_modules;
     FrameObject *_frame;
     HiObject *_ret_value;
+
+    HiObject *_exception_class;
+    HiObject *_pending_exception;
+    HiObject *_trace_back;
     Status _int_status;
 
     static Interpreter *_instance;
@@ -56,6 +60,8 @@ public:
     void leave_frame();
 
     HiObject *call_virtual(HiObject *func, ObjList args);
+
+    Status do_raise(HiObject *exc, HiObject *val, HiObject *tb);
 
     void oops_do(OopClosure *f);
 };

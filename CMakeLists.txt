@@ -25,7 +25,7 @@ set(SOURCE_FILE
         runtime/functionObject.cpp
         runtime/stringTable.cpp
         runtime/module.cpp
-        #runtime/traceback.cpp
+        runtime/traceback.cpp
         #runtime/generator.cpp
         runtime/cellObject.cpp
         memory/heap.cpp

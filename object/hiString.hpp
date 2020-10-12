@@ -74,4 +74,6 @@ public:
 
 HiObject *string_upper(ObjList args);
 
+HiObject *string_join(ObjList args);
+
 #endif //PYTHONVM_HISTRING_HPP

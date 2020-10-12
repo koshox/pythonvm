@@ -64,6 +64,18 @@ HiObject *Klass::create_klass(HiObject *x, HiObject *supers, HiObject *name) {
     return type_obj;
 }
 
+void Klass::print(HiObject *x) {
+    HiObject *meth_repr = get_klass_attr(x, ST(repr));
+    if (meth_repr != Universe::HiNone) {
+        Interpreter::get_instance()->call_virtual(meth_repr, NULL)->print();
+        return;
+    }
+
+    printf("<object of ");
+    x->klass()->name()->print();
+    printf(", at %p>", x);
+}
+
 HiObject *Klass::allocate_instance(HiObject *callable, ArrayList<HiObject *> *args) {
     HiObject *instance = new HiObject();
     instance->set_klass(((HiTypeObject *) callable)->own_klass());

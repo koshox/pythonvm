@@ -30,6 +30,7 @@ void StringKlass::initialize() {
 
     HiDict *klass_dict = new HiDict();
     klass_dict->put(new HiString("upper"), new FunctionObject(string_upper));
+    klass_dict->put(new HiString("join"), new FunctionObject(string_join));
     set_klass_dict(klass_dict);
 
     set_name(new HiString("str"));
@@ -238,4 +239,9 @@ HiString *HiString::join(HiObject *iterable) {
     }
 
     return sz;
+}
+
+HiObject *string_join(ObjList args) {
+    HiString *arg0 = (HiString *) (args->get(0));
+    return arg0->join(args->get(1));
 }
