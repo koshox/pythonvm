@@ -72,8 +72,22 @@ void Interpreter::initialize() {
 
 void Interpreter::run(CodeObject *codes) {
     _frame = new FrameObject(codes);
+    _frame->locals()->put(ST(name), new HiString("__main__"));
 
     eval_frame();
+
+    if (_int_status == IS_EXCEPTION) {
+        _int_status = IS_OK;
+
+        _trace_back->print();
+        _pending_exception->print();
+        printf("\n");
+
+        _trace_back = NULL;
+        _pending_exception = NULL;
+        _exception_class = NULL;
+    }
+
     destroy_frame();
 }
 
@@ -683,6 +697,11 @@ void Interpreter::eval_frame() {
 
         // has pending exception and no handler found, unwind stack.
         if (_int_status != IS_OK && _frame->_loop_stack->size() == 0) {
+            if (_int_status == IS_EXCEPTION) {
+                _ret_value = NULL;
+                ((Traceback *) _trace_back)->record_frame(_frame);
+            }
+
             if (_int_status == IS_RETURN) {
                 _int_status = IS_OK;
             }

@@ -78,10 +78,10 @@ Traceback::Traceback() {
 }
 
 void Traceback::record_frame(FrameObject *frame) {
-    // _stack_elements->append(
-    //         new StackElement(
-    //                 frame->file_name(),
-    //                 frame->func_name(),
-    //                 frame->lineno()));
+    _stack_elements->append(
+            new StackElement(
+                    frame->file_name(),
+                    frame->func_name(),
+                    frame->lineno()));
 }
 

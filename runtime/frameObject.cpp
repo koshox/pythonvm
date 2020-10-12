@@ -16,7 +16,6 @@ FrameObject::FrameObject(CodeObject *codes) {
 
     _locals = new HiDict();
     _globals = _locals;
-    _locals->put(new HiString("__name__"), new HiString("__main__"));
     _fast_locals = NULL;
 
     _stack = new HiList();
@@ -159,6 +158,18 @@ HiObject *FrameObject::get_cell_from_parameter(int i) {
     HiObject *cell_name = _codes->_cell_vars->get(i);
     i = _codes->_var_names->index(cell_name);
     return _fast_locals->get(i);
+}
+
+int FrameObject::lineno() {
+    return _codes->_lineno;
+}
+
+HiString *FrameObject::file_name() {
+    return _codes->_file_name;
+}
+
+HiString *FrameObject::func_name() {
+    return _codes->_co_name;
 }
 
 void FrameObject::oops_do(OopClosure *f) {

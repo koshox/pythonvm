@@ -101,6 +101,12 @@ public:
 
     int get_op_arg();
 
+    HiString *file_name();
+
+    HiString *func_name();
+
+    int lineno();
+
     void oops_do(OopClosure *f);
 };
 
