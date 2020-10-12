@@ -173,6 +173,10 @@ HiObject *len(ObjList args) {
     return args->get(0)->len();
 }
 
+HiObject* iter(ObjList args) {
+    return args->get(0)->iter();
+}
+
 HiObject *isinstance(ObjList args) {
     HiObject *x = args->get(0);
     HiObject *y = args->get(1);

@@ -53,6 +53,7 @@ Interpreter::Interpreter() {
     _builtins->put(new HiString("None"), Universe::HiNone);
 
     _builtins->put(new HiString("len"), new FunctionObject(len));
+    _builtins->put(new HiString("iter"), new FunctionObject(iter));
     _builtins->put(new HiString("type"), new FunctionObject(type_of));
     _builtins->put(new HiString("isinstance"), new FunctionObject(isinstance));
 
@@ -65,6 +66,7 @@ Interpreter::Interpreter() {
 
 void Interpreter::initialize() {
     _builtins->extend(ModuleObject::import_module((HiString *) Universe::HiNone, new HiString("builtin")));
+    Universe::stop_iteration = _builtins->get(new HiString("StopIteration"));
 
     _modules = new HiDict();
     _modules->put(new HiString("__builtins__"), _builtins);
@@ -224,13 +226,16 @@ void Interpreter::eval_frame() {
 
             case ByteCode::FOR_ITER:
                 v = TOP();
-                w = v->getattr(StringTable::get_instance()->next_str);
-                // TODO
-                build_frame(w, NULL, 0);
+                w = v->next();
 
-                if (TOP() == NULL) {
+                if (w == NULL) {
+                    // we may encounter a StopIteration, ignore it.
+                    // assert(_int_status == IS_EXCEPTION && _pending_exception != NULL);
                     _frame->_pc += op_arg;
-                    POP();
+                    _int_status = IS_OK;
+                    _pending_exception = NULL;
+                } else {
+                    PUSH(w);
                 }
                 break;
 
@@ -796,14 +801,6 @@ void Interpreter::oops_do(OopClosure *f) {
     }
 }
 
-/**
- * 抛出异常
- *
- * @param exc 异常类型
- * @param val 异常实例
- * @param tb 异常堆栈
- * @return 状态
- */
 Interpreter::Status Interpreter::do_raise(HiObject *exc, HiObject *val, HiObject *tb) {
     assert(exc != NULL);
 

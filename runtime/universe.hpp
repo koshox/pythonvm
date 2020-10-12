@@ -14,7 +14,7 @@ class HiObject;
 class CodeObject;
 class OopClosure;
 
-template <typename T>
+template<typename T>
 class ArrayList;
 
 class Universe {
@@ -24,9 +24,11 @@ public:
 
     static HiObject *HiNone;
 
-    static ArrayList<Klass*>* klasses;
+    static ArrayList<Klass *> *klasses;
 
     static CodeObject *main_code;
+
+    static HiObject *stop_iteration;
 
     static Heap *heap;
 
@@ -35,7 +37,7 @@ public:
 
     static void destory();
 
-    static void oops_do(OopClosure* closure);
+    static void oops_do(OopClosure *closure);
 };
 
 #endif //PYTHONVM_UNIVERSE_HPP

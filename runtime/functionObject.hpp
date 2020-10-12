@@ -125,6 +125,7 @@ public:
 };
 
 HiObject* len(ObjList args);
+HiObject* iter(ObjList args);
 HiObject* isinstance(ObjList args);
 HiObject* type_of(ObjList args);
 

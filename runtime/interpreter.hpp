@@ -61,6 +61,14 @@ public:
 
     HiObject *call_virtual(HiObject *func, ObjList args);
 
+    /**
+      * 抛出异常
+      *
+      * @param exc 异常类型
+      * @param val 异常实例
+      * @param tb 异常堆栈
+      * @return 状态
+      */
     Status do_raise(HiObject *exc, HiObject *val, HiObject *tb);
 
     void oops_do(OopClosure *f);

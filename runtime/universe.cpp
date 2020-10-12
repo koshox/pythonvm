@@ -23,6 +23,7 @@ Heap *Universe::heap = NULL;
 
 CodeObject *Universe::main_code = NULL;
 
+HiObject *Universe::stop_iteration = NULL;
 ArrayList<Klass *> *Universe::klasses = NULL;
 
 void Universe::genesis() {
@@ -79,6 +80,7 @@ void Universe::oops_do(OopClosure *closure) {
     closure->do_oop((HiObject **) &HiFalse);
     closure->do_oop((HiObject **) &HiNone);
 
+    closure->do_oop((HiObject **) &stop_iteration);
     closure->do_oop((HiObject **) &main_code);
     closure->do_array_list(&klasses);
 }
