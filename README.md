@@ -43,7 +43,6 @@ class TaskScheduler:
     def new_task(self, task):
         '''
         Admit a newly started task to the scheduler
-
         '''
         self._task_queue.append(task)
 
@@ -57,7 +56,6 @@ class TaskScheduler:
                 # Run until the next yield statement
                 task.next()
                 self._task_queue.append(task)
-
             except StopIteration:
                 # Generator is no longer executing
                 pass
